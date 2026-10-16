@@ -1,0 +1,19 @@
+---
+import logo from '../assets/brand/logo.svg?raw';
+interface Props {
+  class?: string;
+}
+const svg = logo.replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
+---
+
+<span class:list={['logo', Astro.props.class]} set:html={svg} />
+<style>
+  .logo {
+    display: inline-block;
+    line-height: 0;
+  }
+  .logo :global(svg) {
+    height: 100%;
+    width: auto;
+  }
+</style>

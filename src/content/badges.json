@@ -1,0 +1,62 @@
+[
+ {
+  "id": "uso-33",
+  "label": "33 · Comercial pesado",
+  "group": "desempenho",
+  "text": "Aplicação 33 pela norma EN 1307: comercial pesado."
+ },
+ {
+  "id": "garantia-5",
+  "label": "Garantia de fabricação de 5 anos",
+  "group": "garantia",
+  "text": "5 anos contra qualquer defeito latente de fabricação."
+ },
+ {
+  "id": "performance-10",
+  "label": "Garantia de performance de 10 anos",
+  "group": "garantia",
+  "text": "Selo de performance do catálogo Explore."
+ },
+ {
+  "id": "microshield",
+  "label": "Microshield",
+  "group": "saude",
+  "text": "Proteção antibacteriana incorporada à fibra."
+ },
+ {
+  "id": "etiqueta-inspecao",
+  "label": "Etiqueta de inspeção",
+  "group": "desempenho",
+  "text": "Cada caixa identifica lote, cor, quantidade e nome do produto."
+ },
+ {
+  "id": "iso-9001",
+  "label": "Gestão da qualidade · ABNT NBR ISO 9001",
+  "group": "certificacoes",
+  "text": "Fabricante com sistema de gestão da qualidade certificado."
+ },
+ {
+  "id": "iso-14001",
+  "label": "Gestão ambiental · ABNT NBR ISO 14001",
+  "group": "certificacoes",
+  "text": "Fabricante com sistema de gestão ambiental certificado."
+ },
+ {
+  "id": "abnt-ambiental",
+  "label": "Qualidade ABNT Ambiental · PE-158",
+  "group": "certificacoes",
+  "text": "Selo Qualidade ABNT Ambiental, critério PE-158."
+ },
+ {
+  "id": "blife",
+  "label": "B_life",
+  "group": "saude",
+  "text": "Programa de sustentabilidade da Belgotex."
+ },
+ {
+  "id": "fabricado-brasil",
+  "label": "Fabricado com orgulho no Brasil",
+  "group": "saude",
+  "text": "Produção nacional da Belgotex do Brasil."
+ }
+]

@@ -1,0 +1,106 @@
+---
+// Fabricado com orgulho no Brasil (catálogo, p. 38 e 39). O texto do catálogo diz "cada rolo de carpete";
+// aqui fica "cada placa", porque o Explore é em placas. Os selos ficam todos na seção Garantia (Trust).
+import { Picture } from 'astro:assets';
+import { environmentImages } from '../lib/images';
+
+---
+
+<section class="section brasil" data-section-id="brasil" aria-labelledby="brasil-title">
+  <div class="container grid-12">
+    <div class="b-media" data-parallax>
+      <Picture
+        src={environmentImages['tecelagem']!}
+        formats={['avif', 'webp']}
+        widths={[640, 960, 1280, 1600]}
+        sizes="(min-width: 900px) 50vw, 100vw"
+        alt="Fios passando pelos teares de tufting, na produção do carpete"
+        loading="lazy"
+        quality={68}
+      />
+    </div>
+    <div class="b-copy" data-reveal>
+      <p class="eyebrow">Belgotex do Brasil</p>
+      <h2 id="brasil-title">Fabricado com orgulho no Brasil.</h2>
+      <p class="lead">
+        Cada placa que sai da nossa fábrica carrega tecnologia, design e a dedicação de uma equipe comprometida
+        com conforto, bem-estar e alto desempenho.
+      </p>
+      <p>
+        Produzir no Brasil nos deixa mais perto dos clientes, com agilidade, personalização e atenção às
+        necessidades locais. E reforça o compromisso com processos produtivos responsáveis, redução de
+        resíduos, reaproveitamento de materiais e uso consciente dos recursos naturais.
+      </p>
+      <a class="link-arrow" href="https://blife.belgotex.com.br/" target="_blank" rel="noopener">
+        Conheça o B_life, o programa de sustentabilidade da Belgotex
+        <span class="sr-only"> (abre em nova aba)</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid-12 {
+    row-gap: 2.5rem;
+    align-items: center;
+  }
+  .b-media {
+    grid-column: 1 / -1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: 4 / 3;
+    background: #222;
+  }
+  .b-media :global(img) {
+    position: absolute;
+    inset: -8% 0;
+    width: 100%;
+    height: 116%;
+    max-width: none;
+    object-fit: cover;
+    transform: translate3d(0, var(--py, 0), 0);
+    will-change: transform;
+  }
+  .b-copy {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+  @media (min-width: 900px) {
+    .b-media {
+      grid-column: 1 / span 6;
+      aspect-ratio: 5 / 6;
+    }
+    .b-copy {
+      grid-column: 8 / -1;
+    }
+  }
+</style>
+
+<script>
+  // Paralaxe leve da foto da tecelagem (±6% da altura), só com movimento liberado
+  const box = document.querySelector<HTMLElement>('.brasil [data-parallax]');
+  if (box && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let on = false;
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      const r = box.getBoundingClientRect();
+      // -1 (foto no topo da tela) a 1 (no pé); limitado, para a foto nunca sair da caixa quando a página
+      // carrega com ela longe da tela ou quando se chega à seção por um link, sem rolar
+      const p = Math.max(
+        -1,
+        Math.min(1, (r.top + r.height / 2 - innerHeight / 2) / (innerHeight / 2 + r.height / 2)),
+      );
+      box.style.setProperty('--py', `${(-p * 6).toFixed(2)}%`);
+    };
+    new IntersectionObserver(([e]) => {
+      on = e!.isIntersecting;
+      if (on && !raf) raf = requestAnimationFrame(tick);
+    }).observe(box);
+    addEventListener('scroll', () => on && !raf && (raf = requestAnimationFrame(tick)), { passive: true });
+    tick();
+  }
+</script>

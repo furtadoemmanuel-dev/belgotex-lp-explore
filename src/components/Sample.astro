@@ -1,0 +1,952 @@
+---
+/**
+ * CTA "Solicite uma amostra" (logo depois de "Veja de perto") + painel com o formulário de pedido de amostra
+ * com envio pelo correio. Os botões "Pedir amostra" da página (data-sample-open) abrem o mesmo painel.
+ * Envio: mesmo adaptador de leads da cotação (src/lib/lead.ts), com lead_type "amostra".
+ */
+import { getImage } from 'astro:assets';
+import WaLink from './WaLink.astro';
+import Icon from './Icon.astro';
+import { config } from '../config';
+import { colors, designs, colorName } from '../lib/data';
+import { colorImages } from '../lib/images';
+
+const UFS = [
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
+];
+const consentText =
+  'Concordo que a Belgotex use meus dados para enviar a amostra e responder a esta solicitação, conforme a Política de privacidade.';
+const swatches = await Promise.all(
+  colors.map(async (c) => ({
+    ...c,
+    name: colorName(c),
+    img: await getImage({
+      src: colorImages[c.id]!,
+      width: 140,
+      height: 140,
+      fit: 'cover',
+      format: 'webp',
+      quality: 72,
+    }),
+  })),
+);
+const groups = designs.map((d) => ({ ...d, items: swatches.filter((s) => s.design === d.id) }));
+// Leque de amostras do CTA: um design de cada, em tons diferentes
+const fan = ['journey-102', 'frontier-203', 'odyssey-404', 'adventure-305', 'horizon-609'].map(
+  (id) => swatches.find((s) => s.id === id)!,
+);
+const profiles = [
+  ['arquiteto-designer', 'Arquiteto, designer ou especificador'],
+  ['facility', 'Facility management ou manutenção predial'],
+  ['empresa', 'Empresa (compras ou administração)'],
+  ['construtora-incorporadora', 'Construtora ou incorporadora'],
+  ['revenda', 'Revenda'],
+];
+---
+
+<section id="amostra" class="sample-cta" data-section-id="sample" aria-labelledby="amostra-title">
+  <div class="container">
+    <!-- Entrada "pilha → leque" (src/scripts/samplefx.ts): as amostras sobem empilhadas, viram uma torre e se
+         abrem no leque; o título entra palavra por palavra girando, depois o texto e o botão. Fundo com brilho
+         que respira, grade de placas e "50 × 50" gigante; botão magnético. Sem JavaScript ou com movimento
+         reduzido, tudo aparece pronto e parado. -->
+    <div class="sc-card" data-sc-card>
+      <div class="sc-aurora" aria-hidden="true"></div>
+      <div class="sc-grid" aria-hidden="true"></div>
+      <div class="sc-giant" aria-hidden="true" data-sc-giant>50 × 50</div>
+      <div class="sc-copy">
+        <div data-sc-head>
+          <p class="eyebrow sc-eyebrow">Amostras Explore</p>
+          <h2 id="amostra-title">Apresente a textura real ao seu cliente.</h2>
+        </div>
+        <div data-sc-rest>
+          <p class="sc-lead">
+            Escolha as cores da sua composição e receba as amostras pelo correio.
+          </p>
+          <div class="actions">
+            <a
+              class="sc-btn"
+              href="#amostra"
+              data-sample-open
+              data-magnetic
+              data-cta="sample"
+              data-cta-id="sample_band"
+              data-loc="sample_band"
+            >
+              Solicitar amostras
+              <Icon name="arrow" />
+            </a>
+          </div>
+        </div>
+      </div>
+      <ul class="sc-fan" aria-hidden="true">
+        {fan.map((s, i) => (
+          <li style={`--i:${i};--o:${Math.abs(i - 2)}`}>
+            <img src={s.img.src} width="160" height="160" alt="" loading="lazy" decoding="async" />
+            <span>{s.name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <dialog class="sp" data-sample-dialog aria-labelledby="sp-title">
+    <form
+      class="sp-form"
+      novalidate
+      data-sample-form
+      data-endpoint={config.leadEndpoint}
+      data-email={config.sampleEmail}
+      data-campaign={config.campaignCode}
+      data-consent-text={consentText}
+    >
+      <header class="sp-head">
+        <div>
+          <p class="sp-kicker">Amostra pelo correio</p>
+          <h2 id="sp-title" class="sp-title">
+            Solicite uma amostra
+          </h2>
+        </div>
+        <button type="button" class="sp-close" data-sample-close aria-label="Fechar">
+          <Icon name="close" />
+        </button>
+      </header>
+
+      <div class="sp-progress" aria-hidden="true" data-sp-progress>
+        <span class="on"></span>
+        <span data-sp-progress-2></span>
+      </div>
+      <p class="sp-step-label small" data-sp-step-label aria-live="polite">
+        Etapa 1 de 2 · Cores
+      </p>
+
+      <div class="hp" aria-hidden="true">
+        <label for="sp-website">Não preencha este campo</label>
+        <input id="sp-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <fieldset class="sp-step" data-sp-step="1">
+        <legend class="sr-only">Cores e perfil</legend>
+        <fieldset class="sp-field">
+          <legend>Quais cores você quer receber?</legend>
+          <div class="sp-groups">
+            {groups.map((g) => (
+              <div class="sp-group">
+                <p class="sp-gname">{g.name}</p>
+                <ul class="sp-swatches">
+                  {g.items.map((s) => (
+                    <li>
+                      <label title={s.name}>
+                        <input type="checkbox" name="colors" value={s.id} aria-label={s.name} />
+                        <img src={s.img.src} width="140" height="140" alt="" loading="lazy" decoding="async" />
+                        <span class="sp-sw-name" aria-hidden="true">{s.code}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p class="err" id="sp-e-colors" data-sp-error-for="colors"></p>
+        </fieldset>
+        <div class="sp-field">
+          <label for="sp-profile">Você é</label>
+          <select id="sp-profile" name="profile" required aria-describedby="sp-e-profile">
+            <option value="">Selecione</option>
+            {profiles.map(([v, l]) => (
+              <option value={v}>{l}</option>
+            ))}
+          </select>
+          <p class="err" id="sp-e-profile" data-sp-error-for="profile"></p>
+        </div>
+        <button type="button" class="btn btn--primary sp-full" data-sp-next>
+          Continuar
+        </button>
+      </fieldset>
+
+      <fieldset class="sp-step" data-sp-step="2" hidden>
+        <legend class="sr-only">Contato e endereço de entrega</legend>
+        <div class="sp-field">
+          <label for="sp-name">Nome completo</label>
+          <input
+            id="sp-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+            aria-describedby="sp-e-name"
+          />
+          <p class="err" id="sp-e-name" data-sp-error-for="name"></p>
+        </div>
+        <div class="sp-row">
+          <div class="sp-field">
+            <label for="sp-email">E-mail</label>
+            <input
+              id="sp-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              aria-describedby="sp-e-email"
+            />
+            <p class="err" id="sp-e-email" data-sp-error-for="email"></p>
+          </div>
+          <div class="sp-field">
+            <label for="sp-phone">WhatsApp ou telefone</label>
+            <input
+              id="sp-phone"
+              name="phone"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel-national"
+              placeholder="(00) 00000-0000"
+              required
+              aria-describedby="sp-e-phone"
+            />
+            <p class="err" id="sp-e-phone" data-sp-error-for="phone"></p>
+          </div>
+        </div>
+
+        <div class="sp-field">
+          <label for="sp-company">
+            Empresa ou escritório <span class="opt">(opcional)</span>
+          </label>
+          <input id="sp-company" name="company" type="text" autocomplete="organization" />
+        </div>
+
+        <p class="sp-section">Endereço de entrega</p>
+        <div class="sp-field sp-cep">
+          <label for="sp-cep">CEP</label>
+          <input
+            id="sp-cep"
+            name="cep"
+            type="text"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            placeholder="00000-000"
+            required
+            aria-describedby="sp-e-cep"
+          />
+          <p class="err" id="sp-e-cep" data-sp-error-for="cep"></p>
+        </div>
+        <div class="sp-row sp-row--street">
+          <div class="sp-field">
+            <label for="sp-street">Rua / avenida</label>
+            <input
+              id="sp-street"
+              name="street"
+              type="text"
+              autocomplete="address-line1"
+              required
+              aria-describedby="sp-e-street"
+            />
+            <p class="err" id="sp-e-street" data-sp-error-for="street"></p>
+          </div>
+          <div class="sp-field">
+            <label for="sp-number">Número</label>
+            <input
+              id="sp-number"
+              name="number"
+              type="text"
+              inputmode="numeric"
+              required
+              aria-describedby="sp-e-number"
+            />
+            <p class="err" id="sp-e-number" data-sp-error-for="number"></p>
+          </div>
+        </div>
+        <div class="sp-row">
+          <div class="sp-field">
+            <label for="sp-complement">
+              Complemento <span class="opt">(opcional)</span>
+            </label>
+            <input id="sp-complement" name="complement" type="text" autocomplete="address-line2" />
+          </div>
+          <div class="sp-field">
+            <label for="sp-district">Bairro</label>
+            <input
+              id="sp-district"
+              name="district"
+              type="text"
+              autocomplete="address-level3"
+              required
+              aria-describedby="sp-e-district"
+            />
+            <p class="err" id="sp-e-district" data-sp-error-for="district"></p>
+          </div>
+        </div>
+        <div class="sp-row sp-row--city">
+          <div class="sp-field">
+            <label for="sp-city">Cidade</label>
+            <input
+              id="sp-city"
+              name="city"
+              type="text"
+              autocomplete="address-level2"
+              required
+              aria-describedby="sp-e-city"
+            />
+            <p class="err" id="sp-e-city" data-sp-error-for="city"></p>
+          </div>
+          <div class="sp-field">
+            <label for="sp-uf">UF</label>
+            <select id="sp-uf" name="uf" autocomplete="address-level1" required aria-describedby="sp-e-uf">
+              <option value="">—</option>
+              {UFS.map((uf) => (
+                <option value={uf}>{uf}</option>
+              ))}
+            </select>
+            <p class="err" id="sp-e-uf" data-sp-error-for="uf"></p>
+          </div>
+        </div>
+        <div class="sp-field">
+          <label class="consent">
+            <input type="checkbox" name="consent" required aria-describedby="sp-e-consent" />
+            <span>
+              Concordo que a Belgotex use meus dados para enviar a amostra e responder a esta solicitação,
+              conforme a{' '}
+              <a href={config.privacyUrl} target="_blank" rel="noopener">
+                Política de privacidade<span class="sr-only"> (abre em nova aba)</span>
+              </a>
+              .
+            </span>
+          </label>
+          <p class="err" id="sp-e-consent" data-sp-error-for="consent"></p>
+        </div>
+        <div class="sp-submit">
+          <button type="button" class="btn btn--secondary" data-sp-back>
+            Voltar
+          </button>
+          <button type="submit" class="btn btn--primary sp-grow" data-sp-submit>
+            Solicitar amostra
+          </button>
+        </div>
+        <div class="form-error" role="alert" data-sp-error hidden>
+          <p>
+            <strong>Não conseguimos enviar agora.</strong> Seus dados continuam aqui. Tente de novo em
+            instantes ou fale direto com um consultor.
+          </p>
+          <WaLink location="sample_error" class="btn btn--secondary btn--sm" />
+        </div>
+      </fieldset>
+
+      <div class="sp-success" data-sp-success hidden tabindex="-1">
+        <svg class="check" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M15 27l7 7 15-16" fill="none" stroke="currentColor" stroke-width="2.5"></path>
+        </svg>
+        <h3 data-sp-success-title>Pedido de amostra recebido</h3>
+        <p data-sp-success-text>
+          Obrigado! A Belgotex vai entrar em contato para confirmar o envio das amostras de
+          <strong data-sp-summary></strong>.
+        </p>
+        <p class="small" data-sp-mail hidden>
+          O seu programa de e-mail abriu com o pedido pronto: é só conferir e enviar. Não abriu?
+          <a data-sp-mail-link href="#">Abrir o e-mail do pedido</a>.
+        </p>
+        <WaLink location="sample_success" class="btn btn--primary">
+          Continuar no WhatsApp
+        </WaLink>
+      </div>
+    </form>
+  </dialog>
+</section>
+
+<style>
+  /* Faixa do CTA */
+  .sample-cta {
+    padding-block: 0 var(--space-section);
+  }
+  .sc-card {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    padding: clamp(1.75rem, 1.25rem + 2.5vw, 3.5rem);
+    background: var(--ink);
+    color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  @media (min-width: 900px) {
+    .sc-card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .sc-copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .sc-eyebrow {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .sc-copy h2 {
+    color: #fff;
+  }
+  .sc-lead {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: var(--fs-lead);
+    max-width: 34ch;
+  }
+  .sc-copy,
+  .sc-fan {
+    position: relative;
+    z-index: 2;
+  }
+  .sc-copy {
+    gap: 1.25rem;
+  }
+  .sc-copy > div {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  /* Botão em pílula (como os do rodapé); o efeito magnético vem de magnetic.ts */
+  .sc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 56px;
+    padding: 0.9rem 2rem;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #f4f1ec, #e3ddd2);
+    box-shadow:
+      0 10px 30px -10px rgb(0 0 0 / 0.6),
+      inset 0 1px 1px rgb(255 255 255 / 0.6);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .sc-btn:hover {
+    background: linear-gradient(145deg, #fff, #ece5d8);
+    box-shadow:
+      0 20px 40px -10px rgb(0 0 0 / 0.75),
+      inset 0 1px 1px rgb(255 255 255 / 0.8);
+  }
+  .sc-btn :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+  .sc-card :focus-visible {
+    outline-color: #fff;
+  }
+
+  /* Fundo: brilho que respira atrás do leque e a grade de placas 50 × 50 */
+  .sc-aurora {
+    position: absolute;
+    right: -10%;
+    top: 50%;
+    width: 75%;
+    height: 140%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgb(236 229 216 / 0.16) 0%,
+      rgb(62 75 87 / 0.38) 45%,
+      transparent 100%
+    );
+    transform: translateY(-50%);
+    animation: sc-breathe 8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes sc-breathe {
+    from {
+      transform: translateY(-50%) scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: translateY(-50%) scale(1.12);
+      opacity: 1;
+    }
+  }
+  .sc-grid {
+    position: absolute;
+    inset: 0;
+    background-size: 64px 64px;
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    -webkit-mask-image: radial-gradient(ellipse 70% 90% at 70% 50%, #000 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 90% at 70% 50%, #000 20%, transparent 75%);
+    pointer-events: none;
+  }
+  .sc-giant {
+    position: absolute;
+    right: -0.04em;
+    bottom: -0.2em;
+    font-family: var(--font-display);
+    font-size: clamp(7rem, 4rem + 14vw, 15rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.08);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.1) 0%, transparent 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    transform-origin: 100% 100%;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform, opacity;
+  }
+  .sc-card:not(.is-live) .sc-aurora {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sc-aurora {
+      animation: none;
+    }
+  }
+
+  /* Leque de amostras: abre com a rolagem (--open, de 0 a 1, vem do script; sem script fica aberto)
+     e abre mais com o mouse em cima da faixa */
+  .sc-fan {
+    --open: 1;
+    --spread: 1;
+    --lift: 0px;
+    --turn: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: clamp(170px, 22vw, 240px);
+    transform: translateY(calc((1 - var(--open)) * 36px));
+  }
+  .sc-fan li {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(110px, 13vw, 150px);
+    aspect-ratio: 1;
+    margin: calc(clamp(110px, 13vw, 150px) / -2) 0 0 calc(clamp(110px, 13vw, 150px) / -2);
+    background: #fff;
+    padding: 6px 6px 22px;
+    border-radius: 3px;
+    box-shadow: 0 18px 30px -16px rgba(0, 0, 0, 0.6);
+    --x: calc((var(--i) - 2) * clamp(52px, 7vw, 86px));
+    --r: calc((var(--i) - 2) * 7deg);
+    transform: translate(
+        calc(var(--x) * var(--open) * var(--spread)),
+        calc(var(--o) * 10px * var(--open) + var(--lift))
+      )
+      rotate(calc(var(--r) * var(--open) * var(--turn)));
+  }
+  .sc-fan img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sc-fan span {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 3px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sc-fan li {
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .sc-card:hover .sc-fan {
+        --spread: 1.12;
+        --lift: -6px;
+        --turn: 1.2;
+      }
+    }
+  }
+
+  /* Painel lateral do formulário */
+  .sp {
+    margin: 0 0 0 auto;
+    padding: 0;
+    border: 0;
+    width: min(560px, 100vw);
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: -20px 0 60px -20px rgba(0, 0, 0, 0.45);
+  }
+  .sp::backdrop {
+    background: rgb(20 18 17 / 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sp[open] {
+      animation: sp-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .sp[open]::backdrop {
+      animation: sp-fade 0.3s ease;
+    }
+    @keyframes sp-in {
+      from {
+        transform: translateX(40px);
+        opacity: 0;
+      }
+    }
+    @keyframes sp-fade {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+  .sp-form {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
+  .sp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 1rem;
+  }
+  .sp-kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .sp-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+    line-height: 1.1;
+  }
+  .sp-close {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    flex: none;
+  }
+  .sp-close :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+  .sp-progress {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+  .sp-progress[hidden] {
+    display: none;
+  }
+  .sp-progress span {
+    height: 4px;
+    background: var(--stone);
+    transition: background-color 0.3s;
+  }
+  .sp-progress span.on {
+    background: var(--ink);
+  }
+  .sp-step-label {
+    color: var(--ink-2);
+    margin-top: -0.5rem;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .sp-step {
+    display: grid;
+    gap: 1rem;
+  }
+  .sp-step[hidden] {
+    display: none;
+  }
+  .sp-field {
+    display: grid;
+    gap: 0.375rem;
+  }
+  .sp-field > label,
+  .sp-field > legend {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    padding: 0;
+    margin-bottom: 0.375rem;
+  }
+  .sp-section {
+    font-weight: 600;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  .opt {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+  .sp input[type='text'],
+  .sp input[type='tel'],
+  .sp input[type='email'],
+  .sp select {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #8a8d91;
+    border-radius: var(--radius);
+    background: var(--white);
+    font-size: 1rem;
+  }
+  .sp input:focus,
+  .sp select:focus {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(35, 31, 32, 0.12);
+    outline: none;
+  }
+  .sp select {
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+      linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) 50%,
+      calc(100% - 13px) 50%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2.25rem;
+  }
+  .sp [aria-invalid='true'] {
+    border: 2px solid var(--error) !important;
+  }
+  .sp-row {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 480px) {
+    .sp-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .sp-row--street {
+      grid-template-columns: 1fr 110px;
+    }
+    .sp-row--city {
+      grid-template-columns: 1fr 110px;
+    }
+    .sp-cep {
+      max-width: 200px;
+    }
+  }
+
+  /* Amostras para escolher */
+  .sp-swatches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+    gap: 0.4rem;
+  }
+  .sp-groups {
+    display: grid;
+    gap: 0.875rem;
+  }
+  .sp-gname {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    margin-bottom: 0.35rem;
+  }
+  .sp-swatches label {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      transform 0.2s;
+  }
+  .sp-swatches input {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--ink);
+    z-index: 1;
+  }
+  .sp-swatches img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .sp-sw-name {
+    font:
+      600 0.75rem/1.2 ui-monospace,
+      Menlo,
+      monospace;
+    text-align: center;
+  }
+  .sp-sw-code {
+    color: var(--ink-2);
+  }
+  .sp-swatches label:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 1px var(--ink);
+  }
+  .sp-swatches label:has(input:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sp-swatches label:has(input:checked) {
+      animation: sw-pick 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.3);
+    }
+    @keyframes sw-pick {
+      50% {
+        transform: scale(0.96);
+      }
+    }
+  }
+
+  .consent {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .consent input {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    margin: 1px 0 0;
+    accent-color: var(--ink);
+  }
+  .err {
+    color: var(--error);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .err:empty {
+    display: none;
+  }
+  .sp-full {
+    width: 100%;
+  }
+  .sp-submit {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .sp-grow {
+    flex: 1;
+  }
+  [data-sp-submit][aria-busy='true'] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .form-error[hidden] {
+    display: none;
+  }
+  .form-error {
+    border-left: 3px solid var(--error);
+    padding: 0.75rem 1rem;
+    background: #fbf1ef;
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .sp-success {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding-top: 1rem;
+  }
+  .sp-success[hidden] {
+    display: none;
+  }
+  .sp-success h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 2rem;
+  }
+  .check {
+    width: 56px;
+    height: 56px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .check circle {
+      stroke-dasharray: 152;
+      stroke-dashoffset: 152;
+      animation: draw 0.6s ease-out forwards;
+    }
+    .check path {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: draw 0.35s 0.5s ease-out forwards;
+    }
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+</style>
+
+<script>
+  import { initSample } from '../scripts/sample';
+  import { initSampleFx } from '../scripts/samplefx';
+  initSample();
+  initSampleFx();
+</script>

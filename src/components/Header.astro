@@ -1,0 +1,107 @@
+---
+import QuoteLink from './QuoteLink.astro';
+import Brandmark from './Brandmark.astro';
+import WaLink from './WaLink.astro';
+---
+
+<header class="site-header" data-section-id="header">
+  <div class="container bar">
+    <a href="#inicio" class="brand" aria-label="Belgotex do Brasil, voltar ao início">
+      <Brandmark class="brand-logo" />
+      <span class="brand-product" aria-hidden="true">
+        Explore
+      </span>
+    </a>
+    <nav class="anchors" aria-label="Seções da página">
+      <a href="#designs">Designs e cores</a>
+      <a href="#combine">Combine</a>
+      <a href="#ambientes">Ambientes</a>
+      <a href="#especificar">Especificação</a>
+    </nav>
+    <div class="header-ctas">
+      <WaLink location="header" class="header-wa" icon={false} />
+      <QuoteLink class="btn btn--primary btn--sm" loc="header" />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 68px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    text-decoration: none;
+    min-height: 44px;
+  }
+  .brand :global(.brand-logo) {
+    height: 28px;
+  }
+  .brand-product {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    padding-left: 0.875rem;
+    border-left: 1px solid var(--line);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .anchors {
+    display: none;
+    gap: 2rem;
+    font-size: 0.9375rem;
+  }
+  .anchors a {
+    text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .anchors a:hover {
+    text-decoration: underline;
+  }
+  .header-ctas {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .header-ctas :global(.header-wa) {
+    display: none;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    min-height: 44px;
+    align-items: center;
+  }
+  .header-ctas :global(.header-wa:hover) {
+    text-decoration: underline;
+  }
+  @media (max-width: 359px) {
+    .brand-product {
+      display: none;
+    }
+  }
+  @media (min-width: 768px) {
+    .header-ctas :global(.header-wa) {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 1024px) {
+    .anchors {
+      display: flex;
+    }
+  }
+</style>

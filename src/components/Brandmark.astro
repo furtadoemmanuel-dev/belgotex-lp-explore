@@ -1,0 +1,20 @@
+---
+// "B_": assinatura curta da Belgotex (b_.pdf). Fica fixa no topo esquerdo; o logo completo vai só no rodapé.
+import mark from '../assets/brand/brandmark.svg?raw';
+interface Props {
+  class?: string;
+}
+const svg = mark.replace('<svg ', '<svg aria-hidden="true" focusable="false" ');
+---
+
+<span class:list={['mark', Astro.props.class]} set:html={svg} />
+<style>
+  .mark {
+    display: inline-block;
+    line-height: 0;
+  }
+  .mark :global(svg) {
+    height: 100%;
+    width: auto;
+  }
+</style>

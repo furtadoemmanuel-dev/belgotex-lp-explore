@@ -1,0 +1,897 @@
+---
+/**
+ * "Combine & Multiplique": o compositor de paginação (recurso-assinatura da LP).
+ * A pessoa escolhe até 3 cores, a distribuição e vê o piso em Tecelagem (placas 50 × 50 cm), em perspectiva
+ * ou de cima, com as setas do verso. Estima as caixas pela área e leva as cores à amostra e ao WhatsApp.
+ * A primeira pintura vem pronta do build (src/lib/weave.ts); src/scripts/composer.ts assume a partir daí.
+ */
+import { getImage } from 'astro:assets';
+import WaLink from './WaLink.astro';
+import { colors, combos, designs, tones, colorName } from '../lib/data';
+import { colorImages } from '../lib/images';
+import { COLS, ROWS, TILE_M, layout, weaveRotation } from '../lib/weave';
+import QuoteLink from './QuoteLink.astro';
+
+const start = combos[0]!;
+const tileImg = Object.fromEntries(
+  await Promise.all(
+    start.colors.map(async (id) => [
+      id,
+      (await getImage({ src: colorImages[id]!, width: 320, height: 320, fit: 'cover', format: 'webp', quality: 72 }))
+        .src,
+    ]),
+  ),
+);
+const idx = layout(start.colors.length, 'mistura', 1);
+const tiles = idx.map((k, i) => ({
+  color: start.colors[k]!,
+  r: weaveRotation(i % COLS, Math.floor(i / COLS)),
+  d: (i % COLS) + Math.floor(i / COLS),
+}));
+const thumbs = Object.fromEntries(
+  await Promise.all(
+    colors.map(async (c) => [
+      c.id,
+      (await getImage({ src: colorImages[c.id]!, width: 120, height: 120, fit: 'cover', format: 'webp', quality: 70 }))
+        .src,
+    ]),
+  ),
+);
+const shared = tones.filter((t) => !t.exclusive);
+const exclusive = tones.filter((t) => t.exclusive);
+const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const nameOf = (id: string) => colorName(colors.find((c) => c.id === id)!);
+---
+
+<section id="combine" class="section section--ink composer" data-section-id="composer" aria-labelledby="combine-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Combine &amp; Multiplique</p>
+      <h2 id="combine-title">Monte o seu piso, placa por placa.</h2>
+      <p class="lead">
+        Escolha até três cores, defina a distribuição e veja a composição em Tecelagem, a paginação indicada
+        para o Explore. Depois peça as amostras exatamente dessas cores.
+      </p>
+    </div>
+
+    <div class="cmp" data-composer data-start={JSON.stringify(start.colors)}>
+      <div class="c-stage">
+        <div class="c-tools" role="group" aria-label="Visualização">
+          <div class="seg" role="radiogroup" aria-label="Vista">
+            <button type="button" role="radio" aria-checked="true" data-view="perspectiva">Perspectiva</button>
+            <button type="button" role="radio" aria-checked="false" data-view="cima">Vista de cima</button>
+          </div>
+          <label class="sw-toggle">
+            <input type="checkbox" data-arrows />
+            <span>Setas do verso</span>
+          </label>
+        </div>
+        <div class="c-view" data-view-mode="perspectiva" data-zoom-view>
+          <!-- Camada de zoom (src/scripts/compzoom.ts): aproxima e afasta sem mexer na vista escolhida -->
+          <div class="c-zoom" data-zoom-layer>
+          <div
+            class="c-floor"
+            data-floor
+            style={`--cols:${COLS};--rows:${ROWS}`}
+            role="img"
+            aria-label={`Composição em Tecelagem com ${start.colors.map(nameOf).join(', ')}`}
+          >
+            {tiles.map((t) => (
+              <span class="t" style={`--r:${t.r}deg;--d:${t.d}`} data-c={t.color}>
+                <i class="l" data-bg={tileImg[t.color]}></i>
+                <i class="l l2"></i>
+                <b class="ar" aria-hidden="true"></b>
+              </span>
+            ))}
+          </div>
+          </div>
+          <div class="c-zoomctl" role="group" aria-label="Zoom da composição">
+            <button type="button" data-zoom="out" aria-label="Afastar">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"></path></svg>
+            </button>
+            <button type="button" class="c-zoomval" data-zoom="reset" aria-label="Voltar ao tamanho original">
+              <span data-zoom-label>100%</span>
+            </button>
+            <button type="button" data-zoom="in" aria-label="Aproximar">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"></path></svg>
+            </button>
+          </div>
+          <p class="c-zoomhint small" aria-hidden="true" data-zoom-hint>
+            <span class="hint-fine">Pinça ou Ctrl + rolagem para aproximar · duplo clique alterna</span>
+            <span class="hint-touch">Pinça para aproximar · toque duplo alterna</span>
+          </p>
+        </div>
+        <div class="c-legend">
+          <ul data-legend aria-label="Cores da composição">
+            {start.colors.map((id) => (
+              <li>
+                <img src={thumbs[id]} width="28" height="28" alt="" />
+                {nameOf(id)}
+              </li>
+            ))}
+          </ul>
+          <p class="small c-scale">
+            Área exibida: {fmt(COLS * TILE_M)} × {fmt(ROWS * TILE_M)} m · {COLS * ROWS} placas de 50 × 50 cm
+          </p>
+        </div>
+      </div>
+
+      <div class="c-panel">
+        <fieldset class="c-step">
+          <legend><span class="n">1</span> Cores <span class="opt">(até 3)</span></legend>
+          <ol class="slots" data-slots>
+            {[0, 1, 2].map((i) => {
+              const id = start.colors[i];
+              return (
+                <li data-slot={i}>
+                  {id ? (
+                    <button type="button" class="slot-on" data-remove={id} aria-label={`Remover ${nameOf(id)}`}>
+                      <img src={thumbs[id]} width="40" height="40" alt="" />
+                      <span>{nameOf(id)}</span>
+                      <span class="x" aria-hidden="true">×</span>
+                    </button>
+                  ) : (
+                    <span class="slot-empty">Escolha abaixo</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+          <label class="sw-toggle same">
+            <input type="checkbox" data-same checked />
+            <span>Só cores do mesmo tom</span>
+          </label>
+          <div class="pal" role="group" aria-label="Paleta de cores">
+            <div class="pal-head" aria-hidden="true">
+              <span></span>
+              {shared.map((t) => <span>{t.id}</span>)}
+            </div>
+            {designs.map((d) => (
+              <div class="pal-row">
+                <span class="pal-name">{d.name}</span>
+                {shared.map((t) => {
+                  const c = colors.find((x) => x.design === d.id && x.tone === t.id)!;
+                  return (
+                    <button
+                      type="button"
+                      data-add={c.id}
+                      data-tone={c.tone}
+                      aria-pressed={start.colors.includes(c.id) ? 'true' : 'false'}
+                      aria-label={colorName(c)}
+                      title={colorName(c)}
+                      style={`--c:${c.hex}`}
+                    >
+                      <img src={thumbs[c.id]} width="40" height="40" alt="" loading="lazy" decoding="async" />
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+            <div class="pal-row pal-excl">
+              <span class="pal-name">Horizon exclusivas</span>
+              {exclusive.map((t) => {
+                const c = colors.find((x) => x.design === 'horizon' && x.tone === t.id)!;
+                return (
+                  <button
+                    type="button"
+                    data-add={c.id}
+                    data-tone="x"
+                    aria-pressed="false"
+                    aria-label={`${colorName(c)}, exclusiva`}
+                    title={colorName(c)}
+                    style={`--c:${c.hex}`}
+                  >
+                    <img src={thumbs[c.id]} width="40" height="40" alt="" loading="lazy" decoding="async" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <p class="c-msg small" data-msg aria-live="polite"></p>
+          <div class="presets">
+            <p class="small">Ou comece por uma combinação do catálogo:</p>
+            <ul>
+              {combos.map((c) => (
+                <li>
+                  <button type="button" data-preset={JSON.stringify(c.colors)} title={c.source}>
+                    <span class="pdots" aria-hidden="true">
+                      {c.colors.map((id) => (
+                        <img src={thumbs[id]} width="20" height="20" alt="" loading="lazy" />
+                      ))}
+                    </span>
+                    {c.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </fieldset>
+
+        <fieldset class="c-step">
+          <legend><span class="n">2</span> Distribuição</legend>
+          <div class="seg seg--full" role="radiogroup" aria-label="Distribuição das cores">
+            <button type="button" role="radio" aria-checked="true" data-mode="mistura">Mistura</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="xadrez">Diagonal</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="faixas">Faixas</button>
+          </div>
+          <button type="button" class="linkbtn" data-shuffle>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="none" stroke="currentColor" stroke-width="1.6" d="M4 7h3c5 0 5 10 10 10h3m0 0-3-3m3 3-3 3M4 17h3c1.6 0 2.6-1 3.5-2.4M20 7h-3c-1.6 0-2.6 1-3.5 2.4M20 7l-3-3m3 3-3 3"></path>
+            </svg>
+            Misturar de novo
+          </button>
+        </fieldset>
+
+        <fieldset class="c-step">
+          <legend><span class="n">3</span> Área do projeto <span class="opt">(opcional)</span></legend>
+          <div class="area">
+            <label for="c-area" class="sr-only">Área do projeto em metros quadrados</label>
+            <input id="c-area" type="number" inputmode="decimal" min="1" step="1" placeholder="Ex.: 250" data-area />
+            <span class="unit" aria-hidden="true">m²</span>
+          </div>
+          <div class="estimate" data-estimate aria-live="polite" hidden>
+            <p class="est-total"><strong data-est-total></strong></p>
+            <ul data-est-list></ul>
+            <p class="small est-note">
+              Estimativa pela área, sem recortes nem reserva de manutenção. O consultor confirma a quantidade.
+            </p>
+          </div>
+        </fieldset>
+
+        <div class="c-ctas">
+          <a
+            class="btn btn--primary"
+            href="#amostra"
+            data-sample-open
+            data-sample-from-composer
+            data-cta="sample"
+            data-cta-id="sample_composer"
+            data-loc="composer"
+          >
+            Pedir amostras destas cores
+          </a>
+          <QuoteLink class="btn btn--secondary" loc="composer">Cotar esta composição</QuoteLink>
+          <WaLink location="composer" class="c-wa link-arrow">Mostrar a um consultor</WaLink>
+        </div>
+      </div>
+    </div>
+    <p class="small c-foot">
+      Simulação ilustrativa feita com as texturas das cores. As cores reais podem variar em tom: confira nas
+      amostras.
+    </p>
+  </div>
+</section>
+
+<style>
+  .cmp {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 1024px) {
+    .cmp {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(2rem, 1rem + 3vw, 4rem);
+      align-items: start;
+    }
+    .c-stage {
+      position: sticky;
+      top: 92px;
+    }
+  }
+
+  /* Palco */
+  .c-stage {
+    display: grid;
+    gap: 1rem;
+  }
+  .c-tools {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid rgba(247, 243, 236, 0.3);
+    border-radius: 999px;
+  }
+  .seg button {
+    min-height: 40px;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: rgba(247, 243, 236, 0.85);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.25s,
+      color 0.25s;
+  }
+  .seg button[aria-checked='true'] {
+    background: #f7f3ec;
+    color: var(--ink);
+  }
+  .seg--full {
+    display: flex;
+  }
+  .seg--full button {
+    flex: 1;
+  }
+  .sw-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .sw-toggle input {
+    appearance: none;
+    width: 40px;
+    height: 24px;
+    margin: 0;
+    border-radius: 999px;
+    background: rgba(247, 243, 236, 0.25);
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    flex: none;
+  }
+  .sw-toggle input::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #f7f3ec;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .sw-toggle input:checked {
+    background: #8fa36b;
+  }
+  .sw-toggle input:checked::after {
+    transform: translateX(16px);
+  }
+
+  .c-view {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: radial-gradient(120% 90% at 50% 0%, #34302c 0%, #191715 70%);
+    aspect-ratio: 10 / 7.6;
+    display: grid;
+    place-items: center;
+    touch-action: pan-y;
+  }
+  .c-view[data-zoomed] {
+    touch-action: none; /* com zoom, um dedo arrasta o piso */
+    cursor: grab;
+  }
+  .c-view[data-zoomed]:active {
+    cursor: grabbing;
+  }
+  .c-zoom {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    perspective: 1400px;
+    transform-origin: 0 0;
+    transform: translate(var(--zx, 0px), var(--zy, 0px)) scale(var(--z, 1));
+    transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+  }
+  .c-view[data-zoom-live] .c-zoom {
+    transition: none; /* durante a pinça e o arrasto, segue o dedo sem atraso */
+  }
+  .c-zoomctl {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 999px;
+    background: rgb(25 23 21 / 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .c-zoomctl button {
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+  }
+  .c-zoomctl button:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+  .c-zoomctl button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .c-zoomctl button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+  .c-zoomctl svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .c-zoomval {
+    min-width: 56px !important;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .c-zoomhint {
+    position: absolute;
+    left: 0.85rem;
+    bottom: 1.05rem;
+    z-index: 2;
+    margin: 0;
+    color: rgb(255 255 255 / 0.6);
+    font-size: 0.75rem;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .c-zoomhint[hidden] {
+    display: block;
+    opacity: 0;
+  }
+  .hint-touch {
+    display: none;
+  }
+  @media (hover: none) {
+    .hint-fine {
+      display: none;
+    }
+    .hint-touch {
+      display: inline;
+    }
+  }
+  @media (max-width: 559px) {
+    .c-zoomhint {
+      display: none;
+    }
+  }
+  .c-floor {
+    width: 86%;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.35);
+    transform-style: preserve-3d;
+    transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 40px 60px -30px rgba(0, 0, 0, 0.8);
+  }
+  .c-view[data-view-mode='perspectiva'] .c-floor {
+    transform: translateY(4%) rotateX(50deg) rotateZ(-15deg) scale(0.9);
+  }
+  .c-view[data-view-mode='cima'] .c-floor {
+    width: 92%;
+    transform: none;
+  }
+  /* Luz de janela passando sobre o piso */
+  .c-view::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 246, 228, 0.12) 46%, rgba(255, 255, 255, 0) 62%);
+  }
+  .t {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #2b2825;
+  }
+  .l {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: rotate(var(--r));
+  }
+  .l2 {
+    opacity: 0;
+  }
+  .ar {
+    position: absolute;
+    inset: 22%;
+    opacity: 0;
+    transform: rotate(var(--r));
+    transition: opacity 0.35s;
+    transition-delay: calc(var(--d) * 12ms);
+    background: center / contain no-repeat
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20V5m-6 6 6-6 6 6' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+  }
+  .c-floor[data-arrows] .ar {
+    opacity: 0.9;
+  }
+
+  .c-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    align-items: center;
+  }
+  .c-legend ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .c-legend :global(li) {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .c-legend :global(img) {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .c-scale {
+    color: rgba(247, 243, 236, 0.7);
+  }
+
+  /* Painel */
+  .c-panel {
+    display: grid;
+    gap: 1.75rem;
+  }
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .c-step {
+    display: grid;
+    gap: 0.875rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(247, 243, 236, 0.2);
+  }
+  legend {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 1.0625rem;
+    padding: 0;
+    margin-bottom: 0.875rem;
+  }
+  .n {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(247, 243, 236, 0.5);
+    font-size: 0.8125rem;
+  }
+  .opt {
+    font-weight: 400;
+    color: rgba(247, 243, 236, 0.7);
+  }
+  .slots {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .slots li {
+    min-height: 56px;
+    display: grid;
+  }
+  .slots :global(.slot-empty) {
+    display: grid;
+    place-items: center;
+    border: 1px dashed rgba(247, 243, 236, 0.35);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: rgba(247, 243, 236, 0.6);
+    text-align: center;
+    padding: 0.25rem;
+  }
+  .slots :global(.slot-on) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.45rem 0.3rem 0.3rem;
+    border: 1px solid rgba(247, 243, 236, 0.35);
+    border-radius: 4px;
+    background: rgba(247, 243, 236, 0.06);
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .slots :global(.slot-on:hover) {
+    border-color: #f7f3ec;
+  }
+  .slots :global(.slot-on img) {
+    width: 36px;
+    height: 36px;
+    border-radius: 2px;
+    object-fit: cover;
+  }
+  .slots :global(.slot-on .x) {
+    font-size: 1.1rem;
+    opacity: 0.7;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .slots :global(.slot-on.pop) {
+      animation: pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+    }
+    @keyframes pop {
+      from {
+        transform: scale(0.85);
+        opacity: 0;
+      }
+    }
+  }
+  .same {
+    justify-self: start;
+  }
+
+  .pal {
+    display: grid;
+    gap: 4px;
+  }
+  .pal-head,
+  .pal-row {
+    display: grid;
+    grid-template-columns: minmax(4.5rem, 1.4fr) repeat(6, minmax(0, 1fr));
+    gap: 4px;
+    align-items: center;
+  }
+  .pal-head span {
+    font:
+      600 0.6875rem/1 ui-monospace,
+      Menlo,
+      monospace;
+    color: rgba(247, 243, 236, 0.65);
+    text-align: center;
+  }
+  .pal-name {
+    font-size: 0.8125rem;
+    color: rgba(247, 243, 236, 0.85);
+    line-height: 1.15;
+  }
+  .pal-excl {
+    margin-top: 0.4rem;
+  }
+  .pal button {
+    position: relative;
+    aspect-ratio: 1;
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--c);
+    cursor: pointer;
+    transition:
+      opacity 0.25s,
+      transform 0.25s;
+  }
+  .pal button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .pal button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    transition: box-shadow 0.2s;
+  }
+  .pal button[aria-pressed='true']::after {
+    box-shadow:
+      inset 0 0 0 2px #1f1d1b,
+      inset 0 0 0 4px #f7f3ec;
+  }
+  .pal button[aria-disabled='true'] {
+    opacity: 0.22;
+    cursor: not-allowed;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pal button:not([aria-disabled='true']):hover {
+      transform: scale(1.08);
+      z-index: 1;
+    }
+  }
+  .c-msg:empty {
+    display: none;
+  }
+  .c-msg {
+    color: #f3d9a4;
+  }
+  .presets {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .presets p {
+    color: rgba(247, 243, 236, 0.75);
+  }
+  .presets ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .presets button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0 0.85rem 0 0.4rem;
+    border: 1px solid rgba(247, 243, 236, 0.3);
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .presets button:hover {
+    border-color: #f7f3ec;
+  }
+  .pdots {
+    display: flex;
+  }
+  .pdots img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #1f1d1b;
+    object-fit: cover;
+  }
+  .pdots img + img {
+    margin-left: -7px;
+  }
+  .linkbtn {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .linkbtn:hover {
+    text-decoration: underline;
+  }
+  .linkbtn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .linkbtn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+    text-decoration: none;
+  }
+  .area {
+    position: relative;
+    max-width: 14rem;
+  }
+  .area input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0.75rem 3rem 0.75rem 0.875rem;
+    border: 1px solid rgba(247, 243, 236, 0.45);
+    border-radius: var(--radius);
+    background: rgba(247, 243, 236, 0.06);
+    color: #f7f3ec;
+    font-size: 1rem;
+  }
+  .area input::placeholder {
+    color: rgba(247, 243, 236, 0.5);
+  }
+  .area input:focus {
+    border-color: #f7f3ec;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(247, 243, 236, 0.25);
+  }
+  .unit {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(247, 243, 236, 0.7);
+  }
+  .estimate {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .estimate[hidden] {
+    display: none;
+  }
+  .est-total {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+  .est-total strong {
+    font-weight: 400;
+  }
+  .estimate ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.2rem;
+    font-size: 0.875rem;
+  }
+  .est-note {
+    color: rgba(247, 243, 236, 0.7);
+  }
+  .c-ctas {
+    display: grid;
+    gap: 0.6rem;
+  }
+  @media (min-width: 520px) and (max-width: 1023px) {
+    .c-ctas {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .c-ctas :global(.c-wa) {
+    color: #f7f3ec;
+    justify-self: start;
+  }
+  .c-ctas :global(.c-wa svg) {
+    width: 20px;
+    height: 20px;
+  }
+  .c-foot {
+    margin-top: 2rem;
+    color: rgba(247, 243, 236, 0.65);
+  }
+</style>
+
+<script>
+  import { initComposer } from '../scripts/composer';
+  import { initCompZoom } from '../scripts/compzoom';
+  initComposer();
+  initCompZoom();
+</script>

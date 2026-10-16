@@ -1,0 +1,527 @@
+---
+/**
+ * "Seis caminhos, infinitas histórias": a matriz design × tom (6 × 6 + 3 exclusivas do Horizon).
+ * Mostra de uma vez por que tudo combina: cada coluna é um tom compartilhado pelos seis designs.
+ * Clicar numa cor abre o painel com a textura em Tecelagem, as cores do mesmo tom e as ações.
+ * Também publica os dados das 39 cores (#colors-data), usados pelo compositor e pela amostra.
+ */
+import { getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { colors, designs, tones, colorName, toneLabel } from '../lib/data';
+import { colorImages } from '../lib/images';
+
+const shared = tones.filter((t) => !t.exclusive);
+const exclusive = tones.filter((t) => t.exclusive);
+const data = await Promise.all(
+  colors.map(async (c) => {
+    const src = colorImages[c.id]!;
+    const [thumb, tile, large] = await Promise.all([
+      getImage({ src, width: 120, height: 120, fit: 'cover', format: 'webp', quality: 70 }),
+      getImage({ src, width: 320, height: 320, fit: 'cover', format: 'webp', quality: 72 }),
+      getImage({ src, width: Math.min(480, src.width), format: 'webp', quality: 62 }),
+    ]);
+    return {
+      ...c,
+      name: colorName(c),
+      toneLabel: toneLabel(c.tone),
+      thumb: thumb.src,
+      tile: tile.src,
+      large: large.src,
+    };
+  }),
+);
+const byId = Object.fromEntries(data.map((c) => [c.id, c]));
+const cell = (design: string, tone: string) =>
+  data.find((c) => c.design === design && c.tone === tone);
+const initial = byId['frontier-203']!;
+const designText = Object.fromEntries(designs.map((d) => [d.id, { title: d.title, text: d.text }]));
+---
+
+<section id="designs" class="section section--sand designs" data-section-id="designs" aria-labelledby="designs-title">
+  <script type="application/json" id="colors-data" set:html={JSON.stringify(data)} />
+  <script type="application/json" id="designs-data" set:html={JSON.stringify(designText)} />
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Designs e cores</p>
+      <h2 id="designs-title">Seis caminhos, infinitas histórias.</h2>
+      <p class="lead">
+        Os seis designs dividem a mesma paleta de seis tons, e o final do código indica o tom. Escolha uma cor
+        e veja as que combinam com ela.
+      </p>
+    </div>
+
+    <div class="d-wrap">
+      <div class="matrix-wrap">
+        <table class="matrix" data-matrix>
+          <caption class="sr-only">
+            As 39 cores do Explore: designs nas linhas e tons nas colunas. Escolha uma cor para ver os detalhes.
+          </caption>
+          <thead>
+            <tr>
+              <td></td>
+              {shared.map((t) => (
+                <th scope="col" data-col={t.id}>
+                  <span class="t-code">{t.id}</span>
+                  <span class="t-name">{t.label}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {designs.map((d) => (
+              <tr data-row={d.id}>
+                <th scope="row">
+                  <span class="r-n">{String(d.n).padStart(2, '0')}</span>
+                  <span class="r-name">{d.name}</span>
+                </th>
+                {shared.map((t) => {
+                  const c = cell(d.id, t.id)!;
+                  return (
+                    <td data-col={t.id}>
+                      <button
+                        type="button"
+                        class="sw"
+                        data-color={c.id}
+                        aria-pressed={c.id === initial.id ? 'true' : 'false'}
+                        aria-label={`${c.name}, tom ${t.label}`}
+                        style={`--c:${c.hex}`}
+                      >
+                        <img src={c.thumb} width="60" height="60" alt="" loading="lazy" decoding="async" />
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="excl">
+          <p class="excl-label">
+            <strong>Horizon</strong> · cores exclusivas
+          </p>
+          <ul>
+            {exclusive.map((t) => {
+              const c = cell('horizon', t.id)!;
+              return (
+                <li>
+                  <button
+                    type="button"
+                    class="sw"
+                    data-color={c.id}
+                    aria-pressed="false"
+                    aria-label={`${c.name}, ${t.label}, exclusiva do Horizon`}
+                    style={`--c:${c.hex}`}
+                  >
+                    <img src={c.thumb} width="60" height="60" alt="" loading="lazy" decoding="async" />
+                  </button>
+                  <span class="excl-code">
+                    {t.id} <span class="muted">{t.label}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <p class="hint small">
+          <span class="hint-line" aria-hidden="true"></span>
+          Mesma coluna, mesmo tom: as cores combinam entre si.
+        </p>
+      </div>
+
+      <aside class="detail" aria-live="polite" data-detail>
+        <div class="weave" aria-hidden="true">
+          {[0, 90, 0, 90, 0, 90].map((r) => (
+            <span style={`--r:${r}deg`}>
+              <img data-d-img src={initial.large} width="480" height="480" alt="" loading="lazy" fetchpriority="low" decoding="async" />
+            </span>
+          ))}
+        </div>
+        <p class="weave-cap small muted">Placas em Tecelagem, a paginação indicada</p>
+        <div class="d-body">
+          <p class="d-kicker small">
+            Tom <span data-d-tone>{initial.tone} · {initial.toneLabel}</span>
+          </p>
+          <h3 class="d-name" data-d-name>
+            {initial.name}
+          </h3>
+          <p class="d-title" data-d-title>{designText[initial.design]!.title}</p>
+          <p class="d-text small" data-d-text>{designText[initial.design]!.text}</p>
+          <div class="d-match">
+            <p class="small"><strong>Combina com</strong> (mesmo tom)</p>
+            <ul data-d-match></ul>
+          </div>
+          <div class="d-actions">
+            <button type="button" class="btn btn--primary btn--sm" data-d-add data-cta="composer" data-cta-id="composer_add_designs" data-loc="designs">
+              Usar na composição
+            </button>
+            <a
+              class="btn btn--secondary btn--sm"
+              href="#amostra"
+              data-sample-open
+              data-sample-color={initial.id}
+              data-d-sample
+              data-cta="sample"
+              data-cta-id="sample_designs"
+              data-loc="designs"
+            >
+              Pedir amostra
+            </a>
+          </div>
+          <a
+            class="d-skp link-arrow small"
+            href={initial.skp}
+            data-d-skp
+            data-doc="skp"
+            data-cta="document"
+            data-cta-id="document_skp"
+            data-loc="designs"
+            hidden={!initial.skp}
+          >
+            <Icon name="download" />
+            Baixar SketchUp desta cor (.skp)
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .d-wrap {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 1024px) {
+    .d-wrap {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+      align-items: start;
+    }
+    .detail {
+      position: sticky;
+      top: 92px;
+    }
+  }
+  /* No celular o painel vem antes: a textura grande fica à vista enquanto a pessoa toca nas cores */
+  @media (max-width: 1023px) {
+    .detail {
+      order: -1;
+    }
+  }
+
+  /* Matriz */
+  .matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: clamp(3px, 0.2rem + 0.3vw, 8px);
+    margin: calc(-1 * clamp(3px, 0.2rem + 0.3vw, 8px));
+    table-layout: fixed;
+  }
+  .matrix thead td {
+    width: clamp(70px, 9vw + 30px, 132px);
+  }
+  .matrix th {
+    font-weight: 400;
+    text-align: left;
+  }
+  thead th {
+    vertical-align: bottom;
+    padding-bottom: 0.25rem;
+    transition: color 0.2s;
+  }
+  .t-code {
+    display: block;
+    font:
+      600 0.75rem/1 ui-monospace,
+      Menlo,
+      monospace;
+    letter-spacing: 0.08em;
+  }
+  .t-name {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    line-height: 1.2;
+    margin-top: 0.2rem;
+  }
+  @media (max-width: 599px) {
+    .t-name {
+      display: none;
+    }
+  }
+  tbody th {
+    padding-right: 0.25rem;
+    line-height: 1.15;
+  }
+  .r-n {
+    display: block;
+    font:
+      500 0.6875rem/1 ui-monospace,
+      Menlo,
+      monospace;
+    color: var(--ink-2);
+    letter-spacing: 0.1em;
+  }
+  .r-name {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 0.85rem + 0.7vw, 1.5rem);
+  }
+  td {
+    padding: 0;
+  }
+  .sw {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--c);
+    cursor: pointer;
+    position: relative;
+    min-height: 36px;
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.35s;
+  }
+  .sw img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .sw::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 0 var(--ink);
+    transition: box-shadow 0.25s;
+  }
+  .sw[aria-pressed='true']::after {
+    box-shadow:
+      inset 0 0 0 2px var(--paper),
+      inset 0 0 0 4px var(--ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sw:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 22px -14px rgba(35, 31, 32, 0.6);
+    }
+    .sw:hover img {
+      transform: scale(1.12);
+    }
+  }
+  /* A coluna do tom acende quando o mouse passa ou quando há uma cor escolhida nela */
+  .matrix td,
+  .matrix thead th {
+    transition: opacity 0.3s;
+  }
+  .matrix[data-hover] td:not([data-col-on]) {
+    opacity: 0.45;
+  }
+  .matrix [data-col-on] .t-code,
+  .matrix thead th[data-col-on] {
+    color: var(--ink);
+  }
+  thead th[data-col-on] .t-code::after {
+    content: '';
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    margin-top: 0.35rem;
+    background: var(--ink);
+  }
+
+  .excl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+  .excl ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+  }
+  .excl li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .excl .sw {
+    width: 48px;
+  }
+  .excl-code {
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    display: grid;
+  }
+  .hint {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    color: var(--ink-2);
+  }
+  .hint-line {
+    width: 2px;
+    height: 1.4rem;
+    background: var(--ink);
+  }
+
+  /* Painel da cor */
+  .detail {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+    display: grid;
+    gap: 1rem;
+    box-shadow: 0 24px 48px -36px rgba(35, 31, 32, 0.5);
+  }
+  @media (min-width: 600px) and (max-width: 1023px) {
+    .detail {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-rows: auto auto 1fr;
+      column-gap: 1.5rem;
+    }
+    .weave-cap {
+      grid-row: 2;
+    }
+    .d-body {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+    }
+  }
+  .weave {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    aspect-ratio: 3 / 2;
+    background: var(--stone);
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .weave span {
+    overflow: hidden;
+  }
+  .weave img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: rotate(var(--r));
+  }
+  .detail.swap .weave span {
+    animation: tile-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .detail.swap .weave span:nth-child(2) {
+    animation-delay: 0.06s;
+  }
+  .detail.swap .weave span:nth-child(3) {
+    animation-delay: 0.12s;
+  }
+  .detail.swap .weave span:nth-child(4) {
+    animation-delay: 0.04s;
+  }
+  .detail.swap .weave span:nth-child(5) {
+    animation-delay: 0.1s;
+  }
+  .detail.swap .weave span:nth-child(6) {
+    animation-delay: 0.16s;
+  }
+  @keyframes tile-in {
+    from {
+      opacity: 0.2;
+      transform: scale(0.92);
+    }
+  }
+  .weave-cap {
+    margin-top: -0.5rem;
+  }
+  .d-body {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+  }
+  .d-kicker {
+    font:
+      600 0.75rem/1.2 ui-monospace,
+      Menlo,
+      monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .d-name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+    line-height: 1.05;
+  }
+  .d-title {
+    font-weight: 600;
+  }
+  .d-text {
+    color: var(--ink-2);
+  }
+  .d-match {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  .d-match ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .d-match :global(button) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 36px;
+    padding: 0.2rem 0.6rem 0.2rem 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .d-match :global(button:hover) {
+    border-color: var(--ink);
+  }
+  .d-match :global(img) {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .d-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .d-skp :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+  .d-skp[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { initDesigns } from '../scripts/designs';
+  initDesigns();
+</script>

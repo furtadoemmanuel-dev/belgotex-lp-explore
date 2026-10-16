@@ -1,0 +1,66 @@
+---
+// O WhatsApp fica no botão flutuante (WhatsAppFab), alinhado à direita desta barra
+import QuoteLink from './QuoteLink.astro';
+---
+
+<nav class="sticky-bar" data-sticky aria-label="Ações rápidas">
+  <QuoteLink class="btn btn--primary" loc="sticky_bar" />
+</nav>
+<style>
+  .sticky-bar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 45;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.625rem calc(var(--gutter) + 56px + 0.75rem) calc(0.625rem + env(safe-area-inset-bottom))
+      var(--gutter);
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    transform: translateY(110%);
+    transition: transform 0.25s ease;
+    visibility: hidden;
+  }
+  .sticky-bar.show {
+    transform: none;
+    visibility: visible;
+  }
+  .sticky-bar :global(.btn) {
+    flex: 1;
+    min-height: 48px;
+    padding: 0 0.75rem;
+    font-size: 0.9375rem;
+  }
+  @media (min-width: 768px) {
+    .sticky-bar {
+      display: none;
+    }
+  }
+</style>
+<script>
+  // Aparece depois do hero e some no rodapé (cortina e folha institucional), onde cobriria os botões finais
+  // e os links. A LP não tem formulário de cotação: o botão leva ao site da Belgotex.
+  const bar = document.querySelector<HTMLElement>('[data-sticky]');
+  const hero = document.getElementById('inicio');
+  const footer = document.querySelector('[data-section-id="footer"]');
+  if (bar && hero) {
+    let pastHero = false;
+    let inFooter = false;
+    const update = () => bar.classList.toggle('show', pastHero && !inFooter);
+    new IntersectionObserver(
+      ([e]) => {
+        pastHero = !e!.isIntersecting;
+        update();
+      },
+      { rootMargin: '-120px 0px 0px 0px' },
+    ).observe(hero);
+    if (footer)
+      new IntersectionObserver(
+        ([e]) => {
+          inFooter = e!.isIntersecting;
+          update();
+        },
+        { threshold: 0.05 },
+      ).observe(footer);
+  }
+</script>

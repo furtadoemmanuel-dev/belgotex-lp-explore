@@ -1,0 +1,450 @@
+---
+/**
+ * Por público: arquitetos e especificadores, facility management e empresas (compras). Abas acessíveis;
+ * cada aba traz os argumentos daquele público, uma foto e a ação principal.
+ * Tudo vem da ficha técnica (p. 37), do texto institucional (p. 39) e do FAQ de carpete modular do site.
+ */
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import WaLink from './WaLink.astro';
+import { config } from '../config';
+import { documents } from '../lib/data';
+import { environmentImages } from '../lib/images';
+import QuoteLink from './QuoteLink.astro';
+
+const tabs = [
+  {
+    id: 'especificadores',
+    tab: 'Arquitetos e especificadores',
+    short: 'Especificação',
+    title: 'Tudo para especificar, num lugar só.',
+    img: 'obra-1',
+    // fotos em pé: o corte desce e aproxima a partir da base, para mostrar mais o piso
+    pos: '50% 100%',
+    zoom: 1.2,
+    alt: 'Escritório com carpete Explore Frontier 203 e floreiras',
+    points: [
+      ['Ficha técnica com as normas', 'Aplicação 33 pela EN 1307 e tratamento antimicrobiano pelas AATCC 174, AATCC 138 e ISO 18184.'],
+      ['SketchUp de cada cor', 'Baixe o arquivo .skp direto no seletor de cores, além das bibliotecas 3D Warehouse e Casoca.'],
+      ['Paginação Tecelagem', 'A indicada para o Explore: cada placa gira 90° em relação às vizinhas, seguindo as setas do verso.'],
+      ['Amostras das cores escolhidas', 'Peça as placas das cores da sua composição para apresentar ao cliente.'],
+    ],
+  },
+  {
+    id: 'facility',
+    tab: 'Facility management',
+    short: 'Facility',
+    title: 'Manutenção simples, operação sem parar.',
+    img: 'obra-6',
+    // fotos em pé: o corte desce e aproxima a partir da base, para mostrar mais o piso
+    pos: '50% 85%',
+    zoom: 1,
+    alt: 'Escada e área de circulação sobre carpete Explore Frontier 203',
+    points: [
+      ['Troca pontual', 'As placas são independentes: substitua só a danificada, sem trocar o piso inteiro.'],
+      ['Higiene', 'Tratamento antimicrobiano e antiviral com eficácia comprovada de 99%, e selo Microshield.'],
+      ['Reposição no mesmo lote', 'A etiqueta de inspeção de cada caixa identifica lote, cor, quantidade e produto.'],
+      ['Limpeza profissional', 'Limpeza a úmido e a seco profissional normal. Não lavar, não alvejar, não passar ferro.'],
+      ['Armazenamento', 'Até 6 caixas empilhadas, na horizontal, em local coberto e plano.'],
+      ['Piso elevado', 'Os módulos independentes facilitam o acesso à infraestrutura sob o piso.'],
+    ],
+  },
+  {
+    id: 'empresas',
+    tab: 'Empresas e compras',
+    short: 'Empresas',
+    title: 'Uma escolha segura para o espaço corporativo.',
+    img: 'obra-4',
+    // fotos em pé: o corte desce e aproxima a partir da base, para mostrar mais o piso
+    pos: '50% 100%',
+    zoom: 1.15,
+    alt: 'Área de convivência corporativa com sofá e carpete Explore Frontier 203',
+    points: [
+      ['Uso 33, comercial pesado', 'Feito para recepções, escritórios e áreas de grande circulação.'],
+      ['Fabricado no Brasil', 'Produção nacional da Belgotex: mais proximidade, agilidade e atenção às necessidades locais.'],
+      ['Gestão certificada', 'Fabricante em conformidade com a ABNT NBR ISO 9001 e a ABNT NBR ISO 14001, e selo Qualidade ABNT Ambiental.'],
+      ['Garantia de fabricação de 5 anos', 'Contra qualquer defeito latente de fabricação.'],
+      ['Atendimento direto', 'Um consultor Belgotex acompanha a cotação e a orientação técnica do projeto.'],
+    ],
+  },
+];
+const specDocs = documents;
+---
+
+<section id="especificar" class="section audiences" data-section-id="audiences" aria-labelledby="especificar-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Para quem decide</p>
+      <h2 id="especificar-title">Feito para quem projeta, mantém e compra.</h2>
+    </div>
+    <div class="tablist" role="tablist" aria-label="Escolha o seu perfil" data-tabs>
+      {tabs.map((t, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${t.id}`}
+          aria-controls={`panel-${t.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          data-tab={t.id}
+        >
+          <span class="tab-long">{t.tab}</span>
+          <span class="tab-short" aria-hidden="true">
+            {t.short}
+          </span>
+        </button>
+      ))}
+      <span class="tab-ink" aria-hidden="true" data-tab-ink></span>
+    </div>
+
+    {tabs.map((t, i) => (
+      <div
+        class="panel"
+        role="tabpanel"
+        id={`panel-${t.id}`}
+        aria-labelledby={`tab-${t.id}`}
+        hidden={i !== 0}
+        tabindex="0"
+      >
+        <div class="p-media">
+          <Picture
+            src={environmentImages[t.img]!}
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960]}
+            sizes="(min-width: 900px) 38vw, 100vw"
+            alt={t.alt}
+            loading="lazy"
+            quality={70}
+            style={`object-position: ${t.pos}; --zoom: ${t.zoom}`}
+          />
+          <p class="p-cap small">Frontier 203</p>
+        </div>
+        <div class="p-body">
+          <h3 class="p-title">{t.title}</h3>
+          <ul class="points">
+            {t.points.map(([h, p], k) => (
+              <li style={`--k:${k}`}>
+                <strong>{h}</strong>
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+
+          {t.id === 'especificadores' && (
+            <>
+              <ul class="docs" aria-label="Documentos e bibliotecas do Explore">
+                {specDocs.map((d) => (
+                  <li>
+                    <a
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener"
+                      data-doc={d.id}
+                      data-cta="document"
+                      data-cta-id={`document_${d.id}`}
+                      data-loc="audiences"
+                    >
+                      <span class="doc-label">{d.label}</span>
+                      <span class="doc-meta small">
+                        {d.meta}
+                        <span class="sr-only"> (abre em nova aba)</span>
+                      </span>
+                      <Icon name={d.meta === 'PDF' ? 'download' : 'external'} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div class="actions">
+                <a
+                  class="btn btn--primary"
+                  href="#amostra"
+                  data-sample-open
+                  data-cta="sample"
+                  data-cta-id="sample_audiences"
+                  data-loc="audiences"
+                >
+                  Pedir amostras
+                </a>
+                <a
+                  class="btn btn--secondary"
+                  href={config.simulatorUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-cta="simulator"
+                  data-cta-id="simulator_audiences"
+                  data-loc="audiences"
+                >
+                  Ver no meu ambiente
+                  <span class="sr-only"> (abre em nova aba)</span>
+                </a>
+              </div>
+            </>
+          )}
+          {t.id === 'facility' && (
+            <div class="actions">
+              <WaLink location="audiences_facility" class="btn btn--primary" />
+              <a
+                class="btn btn--secondary"
+                href={documents.find((d) => d.id === 'instalacao')!.url}
+                target="_blank"
+                rel="noopener"
+                data-doc="instalacao"
+                data-cta="document"
+                data-cta-id="document_instalacao_facility"
+                data-loc="audiences"
+              >
+                Guia de instalação e conservação
+                <span class="sr-only"> (PDF, abre em nova aba)</span>
+              </a>
+            </div>
+          )}
+          {t.id === 'empresas' && (
+            <div class="actions">
+              <QuoteLink class="btn btn--primary" loc="audiences" />
+              <WaLink location="audiences_empresas" class="btn btn--secondary" />
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .tablist {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+  .tablist button {
+    min-height: 56px;
+    padding: 0.5rem 0.25rem 0.75rem;
+    border: 0;
+    background: none;
+    font-weight: 600;
+    font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1.0625rem);
+    color: var(--ink-2);
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tablist button[aria-selected='true'] {
+    color: var(--ink);
+  }
+  .tablist button:hover {
+    color: var(--ink);
+  }
+  .tab-short {
+    display: none;
+  }
+  @media (max-width: 639px) {
+    .tab-long {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .tab-short {
+      display: inline;
+    }
+  }
+  .tab-ink {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    width: calc(100% / 3);
+    background: var(--ink);
+    transform: translateX(calc(var(--tab, 0) * 100%));
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .panel {
+    display: grid;
+    gap: 2rem;
+  }
+  .panel[hidden] {
+    display: none;
+  }
+  .panel:focus-visible {
+    outline-offset: 6px;
+  }
+  @media (min-width: 900px) {
+    .panel {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+      align-items: start;
+    }
+  }
+  .p-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: 4 / 5;
+    background: var(--stone);
+  }
+  @media (max-width: 899px) {
+    .p-media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+  /* a foto fica presa à caixa (sem isso ela tomava a altura natural e o corte nunca valia) */
+  .p-media :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(var(--zoom, 1));
+    transform-origin: 50% 100%;
+  }
+  @media (max-width: 899px) {
+    /* no celular a caixa já é deitada e o corte de baixo mostra bastante piso */
+    .p-media :global(img) {
+      transform: none;
+    }
+  }
+  .p-cap {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(31, 29, 27, 0.75);
+    color: #f7f3ec;
+  }
+  .p-body {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .p-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
+    line-height: 1.08;
+  }
+  .points {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+  }
+  @media (min-width: 640px) {
+    .points {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--col-gap);
+    }
+  }
+  .points li {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .points span {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .panel.show .points li {
+      animation: pt-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: calc(var(--k) * 50ms);
+    }
+    .panel.show .p-media :global(img) {
+      animation: media-in 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    @keyframes pt-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+    }
+    @keyframes media-in {
+      from {
+        transform: scale(1.08);
+        opacity: 0.4;
+      }
+    }
+  }
+  .docs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    border-top: 1px solid var(--ink);
+  }
+  @media (min-width: 640px) {
+    .docs {
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--col-gap);
+    }
+  }
+  .docs a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 1rem;
+    padding: 0.875rem 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    min-height: 56px;
+  }
+  .docs a:hover .doc-label {
+    text-decoration: underline;
+  }
+  .doc-label {
+    font-weight: 600;
+  }
+  .doc-meta {
+    color: var(--ink-2);
+    grid-row: 2;
+  }
+  .docs :global(svg) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    width: 22px;
+    height: 22px;
+  }
+  .actions :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+<script>
+  import { track } from '../scripts/analytics';
+
+  const list = document.querySelector<HTMLElement>('[data-tabs]');
+  if (list) {
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, k) => {
+        const on = k === i;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
+        panel.hidden = !on;
+        panel.classList.toggle('show', on);
+      });
+      list.style.setProperty('--tab', String(i));
+      if (focus) tabs[i]!.focus();
+      track('audience_tab', { audience: tabs[i]!.dataset.tab });
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => select(i)));
+    list.addEventListener('keydown', (e) => {
+      const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0) return;
+      const k = e.key;
+      const to =
+        k === 'ArrowRight' ? (i + 1) % tabs.length : k === 'ArrowLeft' ? (i - 1 + tabs.length) % tabs.length : k === 'Home' ? 0 : k === 'End' ? tabs.length - 1 : -1;
+      if (to < 0) return;
+      e.preventDefault();
+      select(to, true);
+    });
+  }
+</script>

@@ -1,0 +1,234 @@
+---
+/**
+ * "Mesmo espaço, outro tom": o mesmo escritório visto de cima em quatro tons da coleção (renders da pasta
+ * "ambientada", explore8 a explore12). Trocar o tom passa uma cortina de luz sobre o piso.
+ * Os arquivos não trazem o código da cor: a cena mostra só o tom, e o código fica com o consultor.
+ */
+import { Picture } from 'astro:assets';
+import { environmentImages } from '../lib/images';
+
+const views = [
+  { id: 'vista-cinza', tone: 'Cinza', hex: '#77797b' },
+  { id: 'vista-bege', tone: 'Bege', hex: '#8c8577' },
+  { id: 'vista-azul', tone: 'Azul', hex: '#5e6d7c' },
+  { id: 'vista-grafite', tone: 'Grafite', hex: '#3f4042' },
+];
+---
+
+<section class="section toneswap" data-section-id="toneswap" aria-labelledby="tons-title">
+  <div class="container grid-12">
+    <div class="ts-copy">
+      <p class="eyebrow">Mesmo espaço, outro tom</p>
+      <h2 id="tons-title">O tom muda o clima do ambiente.</h2>
+      <p class="lead">
+        O mesmo escritório, visto de cima, em quatro tons da coleção. Uma forma rápida de alinhar a escolha com
+        a equipe e com o cliente.
+      </p>
+      <div class="ts-chips" role="radiogroup" aria-label="Tom do piso" data-ts-chips>
+        {views.map((v, i) => (
+          <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-ts={i} style={`--c:${v.hex}`}>
+            <span class="dot" aria-hidden="true"></span>
+            {v.tone}
+          </button>
+        ))}
+      </div>
+      <p class="small muted ts-note">
+        Cenas ilustrativas. Para saber o código exato de cada tom, fale com um consultor ou peça amostras.
+      </p>
+    </div>
+    <div class="ts-stage" data-ts-stage>
+      {views.map((v, i) => (
+        <div class:list={['ts-img', { on: i === 0 }]} data-ts-img={i}>
+          <Picture
+            src={environmentImages[v.id]!}
+            formats={['avif', 'webp']}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 900px) 58vw, 100vw"
+            alt={`Escritório visto de cima com carpete Explore em tom ${v.tone.toLowerCase()}`}
+            loading="lazy"
+            quality={70}
+          />
+        </div>
+      ))}
+      <span class="ts-sweep" aria-hidden="true"></span>
+      <p class="ts-label" aria-live="polite" data-ts-label>{views[0]!.tone}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid-12 {
+    row-gap: 2rem;
+    align-items: center;
+  }
+  .ts-copy {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: center;
+  }
+  .ts-stage {
+    grid-column: 1 / -1;
+    position: relative;
+    aspect-ratio: 10 / 7;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--stone);
+    isolation: isolate;
+  }
+  @media (min-width: 900px) {
+    .ts-copy {
+      grid-column: 1 / span 4;
+    }
+    .ts-stage {
+      grid-column: 6 / -1;
+    }
+  }
+  .ts-img {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+  }
+  .ts-img.on {
+    visibility: visible;
+    z-index: 0;
+  }
+  .ts-img.in {
+    visibility: visible;
+    z-index: 1;
+  }
+  .ts-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ts-sweep {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 40px 18px rgba(255, 244, 222, 0.35);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ts-label {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 3;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(31, 29, 27, 0.78);
+    color: #f7f3ec;
+    font-size: 0.875rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+  }
+  .ts-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .ts-chips button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1rem 0 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .ts-chips button:hover {
+    border-color: var(--ink);
+  }
+  .ts-chips button[aria-checked='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.5);
+  }
+</style>
+
+<script>
+  import { track } from '../scripts/analytics';
+
+  const stage = document.querySelector<HTMLElement>('[data-ts-stage]');
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-ts]')];
+  if (stage && chips.length) {
+    const imgs = [...stage.querySelectorAll<HTMLElement>('[data-ts-img]')];
+    const sweep = stage.querySelector<HTMLElement>('.ts-sweep')!;
+    const label = stage.querySelector<HTMLElement>('[data-ts-label]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let busy = false;
+
+    const go = async (to: number) => {
+      if (busy || to === current) return;
+      busy = true;
+      chips.forEach((c, i) => {
+        c.setAttribute('aria-checked', String(i === to));
+        c.tabIndex = i === to ? 0 : -1;
+      });
+      label.textContent = chips[to]!.textContent!.trim();
+      const next = imgs[to]!;
+      const img = next.querySelector('img');
+      if (img) {
+        img.loading = 'eager';
+        await img.decode().catch(() => undefined);
+      }
+      next.classList.add('in');
+      if (reduce) {
+        await next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250 }).finished;
+      } else {
+        const w = stage.clientWidth;
+        const opts = { duration: 1100, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'both' as const };
+        sweep.animate(
+          [
+            { transform: 'translateX(0)', opacity: 1 },
+            { opacity: 1, offset: 0.85 },
+            { transform: `translateX(${w}px)`, opacity: 0 },
+          ],
+          opts,
+        );
+        next.querySelector('img')?.animate([{ transform: 'scale(1.06)' }, { transform: 'scale(1)' }], {
+          duration: 1400,
+          easing: 'cubic-bezier(.2,.7,.2,1)',
+        });
+        await next.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], opts).finished;
+      }
+      imgs[current]!.classList.remove('on');
+      next.classList.add('on');
+      next.classList.remove('in');
+      next.getAnimations().forEach((a) => a.cancel());
+      current = to;
+      busy = false;
+      track('tone_swap', { tone: label.textContent });
+    };
+
+    chips.forEach((c, i) => c.addEventListener('click', () => void go(i)));
+    chips[0]!.parentElement!.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+      e.preventDefault();
+      const to = (current + (e.key === 'ArrowRight' ? 1 : -1) + chips.length) % chips.length;
+      chips[to]!.focus();
+      void go(to);
+    });
+  }
+</script>

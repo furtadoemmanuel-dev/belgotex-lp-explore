@@ -1,0 +1,130 @@
+---
+// Botão flutuante do WhatsApp, em todas as telas. Verde #1A9E4B: o ícone branco passa 3:1 (WCAG 1.4.11),
+// o que o verde oficial (#25D366) não passa. Some no rodapé e enquanto o aviso de cookies está aberto.
+import WaLink from './WaLink.astro';
+---
+
+<div class="wa-fab" data-wa-fab>
+  <WaLink location="floating" class="wa-fab-btn">
+    <span class="wa-fab-label">Falar com um consultor</span>
+  </WaLink>
+</div>
+
+<style>
+  .wa-fab {
+    position: fixed;
+    right: var(--gutter);
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    z-index: 46;
+    transition:
+      bottom 0.25s ease,
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+  .wa-fab.is-hidden,
+  :global(body:has([data-consent-bar]:not([hidden]))) .wa-fab {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+    pointer-events: none;
+    visibility: hidden;
+  }
+  /* No celular, alinhado à barra fixa de cotação */
+  @media (max-width: 767px) {
+    :global(body:has(.sticky-bar.show)) .wa-fab {
+      bottom: calc(0.625rem - 4px + env(safe-area-inset-bottom));
+    }
+  }
+  .wa-fab :global(.wa-fab-btn) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #1a9e4b;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.45);
+    transition: transform 0.2s ease;
+  }
+  .wa-fab :global(.wa-fab-btn:hover) {
+    transform: scale(1.06);
+  }
+  .wa-fab :global(.wa-fab-btn:focus-visible) {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .wa-fab :global(.wa-fab-btn svg) {
+    width: 28px;
+    height: 28px;
+  }
+  /* Rótulo: aparece ao passar o mouse ou focar (no desktop); no celular fica só para leitores de tela */
+  .wa-fab-label {
+    position: absolute;
+    right: calc(100% + 0.75rem);
+    top: 50%;
+    white-space: nowrap;
+    background: var(--ink);
+    color: #fff;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    padding: 0.5rem 0.875rem;
+    border-radius: 999px;
+    opacity: 0;
+    transform: translate(8px, -50%);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    pointer-events: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wa-fab :global(.wa-fab-btn:hover) .wa-fab-label,
+    .wa-fab :global(.wa-fab-btn:focus-visible) .wa-fab-label {
+      opacity: 1;
+      transform: translate(0, -50%);
+    }
+  }
+  @media not ((hover: hover) and (pointer: fine)) {
+    .wa-fab-label {
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+    }
+  }
+  /* Pulso suave, duas vezes, para chamar atenção sem incomodar */
+  @media (prefers-reduced-motion: no-preference) {
+    .wa-fab :global(.wa-fab-btn)::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #1a9e4b;
+      animation: wa-pulse 1.8s ease-out 1.5s 2 both;
+      pointer-events: none;
+    }
+    @keyframes wa-pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
+  }
+</style>
+
+<script>
+  // Esconde o botão no rodapé: a cortina já tem o botão do consultor, e o flutuante cobriria o
+  // "voltar ao início" e os links da folha institucional
+  const fab = document.querySelector<HTMLElement>('[data-wa-fab]');
+  const footer = document.querySelector('[data-section-id="footer"]');
+  if (fab && footer) {
+    new IntersectionObserver(([e]) => fab.classList.toggle('is-hidden', e!.isIntersecting)).observe(footer);
+  }
+</script>

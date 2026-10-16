@@ -1,0 +1,8 @@
+[
+  { "id": "ficha", "label": "Especificações completas", "meta": "PDF", "url": "https://www.belgotex.com.br/produtos/comercial-em-placas/explore/pdf-track" },
+  { "id": "laudos", "label": "Laudos técnicos", "meta": "PDF", "url": "https://www.belgotex.com.br/produtos/comercial-em-placas/explore/file-click/175" },
+  { "id": "instalacao", "label": "Instalação e conservação", "meta": "PDF", "url": "https://www.belgotex.com.br/produtos/comercial-em-placas/explore/file-click/174" },
+  { "id": "catalogo", "label": "E-catálogo Explore", "meta": "Catálogo digital", "url": "https://www.belgotex.com.br/e-catalogos/explore" },
+  { "id": "3dwarehouse", "label": "Biblioteca SketchUp", "meta": "3D Warehouse", "url": "https://embed-3dwarehouse-classic.sketchup.com/by/belgotexdobrasil" },
+  { "id": "casoca", "label": "Casoca", "meta": "Biblioteca de projetos", "url": "https://casoca.com.br/belgotex-do-brasil.html" }
+]

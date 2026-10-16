@@ -1,0 +1,104 @@
+---
+// Abertura da coleção (texto do catálogo, p. 3) e os números que sustentam a escolha
+const numbers = [
+  { big: '6', unit: 'designs', text: 'Cada um com personalidade própria, todos pensados para funcionar juntos.' },
+  { big: '39', unit: 'cores', text: 'Seis tons compartilhados entre os designs, mais três exclusivas do Horizon.' },
+  { big: '33', unit: 'comercial pesado', text: 'Aplicação pela norma EN 1307, para áreas de grande circulação.' },
+  {
+    big: '99%',
+    unit: 'eficácia antimicrobiana',
+    text: 'Tratamento antimicrobiano e antiviral (AATCC 174, AATCC 138 e ISO 18184).',
+  },
+];
+---
+
+<section class="section manifesto" data-section-id="manifesto" aria-labelledby="manifesto-title">
+  <div class="container grid-12">
+    <p class="eyebrow m-eyebrow">A coleção</p>
+    <h2 id="manifesto-title" class="m-title" data-reveal>
+      O espaço que você habita conta uma história. O Explore existe para que ela seja única.
+    </h2>
+    <div class="m-copy" data-reveal style="--d:1">
+      <p class="lead">
+        São seis designs inspirados na essência da exploração. Produzida com materiais de alta qualidade, a
+        coleção garante durabilidade e um design que se mantém impecável com o tempo.
+      </p>
+      <p>
+        Combine designs e cores e transforme a instalação numa exploração: composições que nenhum outro piso
+        consegue oferecer.
+      </p>
+    </div>
+    <ul class="numbers">
+      {numbers.map((n, i) => (
+        <li data-reveal style={`--d:${i}`}>
+          <p class="n-big">{n.big}</p>
+          <p class="n-unit">{n.unit}</p>
+          <p class="n-text small">{n.text}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid-12 {
+    row-gap: 1.5rem;
+  }
+  .m-eyebrow {
+    grid-column: 1 / -1;
+  }
+  .m-title {
+    grid-column: 1 / -1;
+    font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.25rem);
+    line-height: 1.12;
+    max-width: 22ch;
+  }
+  .m-copy {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1rem;
+    color: var(--ink-2);
+  }
+  @media (min-width: 900px) {
+    .m-title {
+      grid-column: 1 / span 7;
+    }
+    .m-copy {
+      grid-column: 8 / -1;
+      align-self: end;
+    }
+  }
+  .numbers {
+    grid-column: 1 / -1;
+    list-style: none;
+    margin: clamp(2rem, 1.5rem + 2vw, 3.5rem) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem var(--col-gap);
+  }
+  @media (min-width: 900px) {
+    .numbers {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .numbers li {
+    border-top: 1.5px solid var(--ink);
+    padding-top: 1rem;
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+  }
+  .n-big {
+    font-family: var(--font-display);
+    font-size: var(--fs-num);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .n-unit {
+    font-weight: 600;
+  }
+  .n-text {
+    color: var(--ink-2);
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import { config } from '../config';
+import { whatsappHref } from '../lib/whatsapp';
+import Icon from './Icon.astro';
+
+interface Props {
+  location: string;
+  class?: string;
+  icon?: boolean;
+}
+const { location, class: cls, icon = true } = Astro.props;
+const href = whatsappHref({ number: config.whatsappNumber, campaign: config.campaignCode, location });
+---
+
+<a
+  class:list={['js-wa', cls]}
+  href={href}
+  target="_blank"
+  rel="noopener"
+  data-loc={location}
+  data-cta="consultant"
+  data-cta-id={`consultant_${location}`}
+>
+  {icon && <Icon name="whatsapp" />}
+  <slot>Falar com um consultor</slot>
+  <span class="sr-only"> (abre o WhatsApp em nova aba)</span>
+</a>

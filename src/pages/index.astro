@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Manifesto from '../components/Manifesto.astro';
+import Designs from '../components/Designs.astro';
+import Composer from '../components/Composer.astro';
+import ToneSwap from '../components/ToneSwap.astro';
+import Gallery from '../components/Gallery.astro';
+import Audiences from '../components/Audiences.astro';
+import Sample from '../components/Sample.astro';
+import MadeInBrazil from '../components/MadeInBrazil.astro';
+import Trust from '../components/Trust.astro';
+import Faq from '../components/Faq.astro';
+import Footer from '../components/Footer.astro';
+import StickyBar from '../components/StickyBar.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import { config } from '../config';
+
+const pageCfg = { whatsapp: config.whatsappNumber, campaign: config.campaignCode, gtmId: config.gtmId };
+---
+
+<Base
+  title="Explore: carpete modular 50 × 50 cm para projetos corporativos | Belgotex"
+  description="Carpete modular Explore: 6 designs e 39 cores que combinam entre si, uso 33 comercial pesado e tratamento antimicrobiano. Monte sua composição, peça amostras e solicite a cotação."
+>
+  <Header />
+  <main id="conteudo">
+    <Hero />
+    <Manifesto />
+    <Designs />
+    <Composer />
+    <ToneSwap />
+    <Gallery />
+    <Audiences />
+    <Sample />
+    <MadeInBrazil />
+    <Trust />
+    <Faq />
+  </main>
+  <Footer />
+  <StickyBar />
+  <WhatsAppFab />
+  <ConsentBanner />
+  <div data-page-config data-config={JSON.stringify(pageCfg)} hidden></div>
+</Base>
+
+<script>
+  import { initPage } from '../scripts/main';
+  const el = document.querySelector<HTMLElement>('[data-page-config]');
+  initPage(JSON.parse(el?.dataset.config ?? '{}'));
+</script>

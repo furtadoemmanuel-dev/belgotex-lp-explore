@@ -1,0 +1,314 @@
+[
+ {
+  "id": "journey-101",
+  "design": "journey",
+  "code": "101",
+  "tone": "01",
+  "hex": "#837f74",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y2B12TA6NJDWB9WYB0R84.skp"
+ },
+ {
+  "id": "journey-102",
+  "design": "journey",
+  "code": "102",
+  "tone": "02",
+  "hex": "#716456",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y7SX0Y05BB1R1CDQWBNV0.skp"
+ },
+ {
+  "id": "journey-103",
+  "design": "journey",
+  "code": "103",
+  "tone": "03",
+  "hex": "#5e6771",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YQK9JQFE58P9DVC6C8XBX.skp"
+ },
+ {
+  "id": "journey-104",
+  "design": "journey",
+  "code": "104",
+  "tone": "04",
+  "hex": "#37434f",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YVKNXQPW7XRBGXXAZ3R02.skp"
+ },
+ {
+  "id": "journey-105",
+  "design": "journey",
+  "code": "105",
+  "tone": "05",
+  "hex": "#707070",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YVPFPCTEX0Q7NSCX71MHV.skp"
+ },
+ {
+  "id": "journey-106",
+  "design": "journey",
+  "code": "106",
+  "tone": "06",
+  "hex": "#484849",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YZKN6GV0GTM1AKRGJRCH4.skp"
+ },
+ {
+  "id": "frontier-201",
+  "design": "frontier",
+  "code": "201",
+  "tone": "01",
+  "hex": "#7f7c70",
+  "skp": ""
+ },
+ {
+  "id": "frontier-202",
+  "design": "frontier",
+  "code": "202",
+  "tone": "02",
+  "hex": "#6d6153",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y7PS1RQXD3QC4K3BQDX18.skp"
+ },
+ {
+  "id": "frontier-203",
+  "design": "frontier",
+  "code": "203",
+  "tone": "03",
+  "hex": "#5c656f",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YQPFWF102KZYBJ58SGBV8.skp"
+ },
+ {
+  "id": "frontier-204",
+  "design": "frontier",
+  "code": "204",
+  "tone": "04",
+  "hex": "#36424f",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YVVXW3V10YJBCZSAZBPTN.skp"
+ },
+ {
+  "id": "frontier-205",
+  "design": "frontier",
+  "code": "205",
+  "tone": "05",
+  "hex": "#6b6b6b",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YVYJDRC7VBERRM9AMDQHY.skp"
+ },
+ {
+  "id": "frontier-206",
+  "design": "frontier",
+  "code": "206",
+  "tone": "06",
+  "hex": "#474748",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YZP1VDDY24CX122QBYW3C.skp"
+ },
+ {
+  "id": "adventure-301",
+  "design": "adventure",
+  "code": "301",
+  "tone": "01",
+  "hex": "#7d7a6f",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y52RF7R7FD4BBPX8QS0FF.skp"
+ },
+ {
+  "id": "adventure-302",
+  "design": "adventure",
+  "code": "302",
+  "tone": "02",
+  "hex": "#6c6052",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y7JPD3Q46QS1DJB1XKTZG.skp"
+ },
+ {
+  "id": "adventure-303",
+  "design": "adventure",
+  "code": "303",
+  "tone": "03",
+  "hex": "#59636d",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YQSNVNNEP74PE83T7FENV.skp"
+ },
+ {
+  "id": "adventure-304",
+  "design": "adventure",
+  "code": "304",
+  "tone": "04",
+  "hex": "#36424e",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YW4954DKYAGBGYXM91VD4.skp"
+ },
+ {
+  "id": "adventure-305",
+  "design": "adventure",
+  "code": "305",
+  "tone": "05",
+  "hex": "#696968",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YW78ZS5GED8FBT76EKRVE.skp"
+ },
+ {
+  "id": "adventure-306",
+  "design": "adventure",
+  "code": "306",
+  "tone": "06",
+  "hex": "#464748",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YZRFWDGG223XMV1RNAPF9.skp"
+ },
+ {
+  "id": "odyssey-401",
+  "design": "odyssey",
+  "code": "401",
+  "tone": "01",
+  "hex": "#8a887e",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y4YFTHXRK820K2F21QHM5.skp"
+ },
+ {
+  "id": "odyssey-402",
+  "design": "odyssey",
+  "code": "402",
+  "tone": "02",
+  "hex": "#7a7062",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y7G2Y5SV4Z8SP1EYVMT17.skp"
+ },
+ {
+  "id": "odyssey-403",
+  "design": "odyssey",
+  "code": "403",
+  "tone": "03",
+  "hex": "#687078",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YQXT18B83XC3R4E1DPVYW.skp"
+ },
+ {
+  "id": "odyssey-404",
+  "design": "odyssey",
+  "code": "404",
+  "tone": "04",
+  "hex": "#424c55",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YWC9KX40E0XJF0YNER9DW.skp"
+ },
+ {
+  "id": "odyssey-405",
+  "design": "odyssey",
+  "code": "405",
+  "tone": "05",
+  "hex": "#757575",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YWFB6GBS28YXF6P14QA53.skp"
+ },
+ {
+  "id": "odyssey-406",
+  "design": "odyssey",
+  "code": "406",
+  "tone": "06",
+  "hex": "#505050",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YZTYG1AFTJ7E2G8SQP9B5.skp"
+ },
+ {
+  "id": "navigator-501",
+  "design": "navigator",
+  "code": "501",
+  "tone": "01",
+  "hex": "#8a867b",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y4SSN546G7TE4Y0HYS4GS.skp"
+ },
+ {
+  "id": "navigator-502",
+  "design": "navigator",
+  "code": "502",
+  "tone": "02",
+  "hex": "#756a5c",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88Y7CYHP32ZAMH64FMC0FHA.skp"
+ },
+ {
+  "id": "navigator-503",
+  "design": "navigator",
+  "code": "503",
+  "tone": "03",
+  "hex": "#656d75",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YR13HDA5MWKM25C9Q03XJ.skp"
+ },
+ {
+  "id": "navigator-504",
+  "design": "navigator",
+  "code": "504",
+  "tone": "04",
+  "hex": "#464f59",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YR4ABRBXA9V6FTJPCQW31.skp"
+ },
+ {
+  "id": "navigator-505",
+  "design": "navigator",
+  "code": "505",
+  "tone": "05",
+  "hex": "#71716f",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YX2JYKJHVCGSVNX37RHP3.skp"
+ },
+ {
+  "id": "navigator-506",
+  "design": "navigator",
+  "code": "506",
+  "tone": "06",
+  "hex": "#4f5153",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01K88YZXFECBRYT26ZH7S3FADW.skp"
+ },
+ {
+  "id": "horizon-601",
+  "design": "horizon",
+  "code": "601",
+  "tone": "01",
+  "hex": "#837f74",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6WV21MSEE7ADMSXRR5SB7X.skp"
+ },
+ {
+  "id": "horizon-602",
+  "design": "horizon",
+  "code": "602",
+  "tone": "02",
+  "hex": "#716556",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6WWFTK561N4TCXQ4750TMR.skp"
+ },
+ {
+  "id": "horizon-603",
+  "design": "horizon",
+  "code": "603",
+  "tone": "03",
+  "hex": "#626b74",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6WYAK3WWA1ZWRDG04K68FJ.skp"
+ },
+ {
+  "id": "horizon-604",
+  "design": "horizon",
+  "code": "604",
+  "tone": "04",
+  "hex": "#46525e",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6X14Y2Z2KGWJXNJVKNFFWF.skp"
+ },
+ {
+  "id": "horizon-605",
+  "design": "horizon",
+  "code": "605",
+  "tone": "05",
+  "hex": "#87898a",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6X4QEZ528XKRHBJS1M8R8A.skp"
+ },
+ {
+  "id": "horizon-606",
+  "design": "horizon",
+  "code": "606",
+  "tone": "06",
+  "hex": "#5b5c5e",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6X6A1K91NW9DDGTQM86Q0Z.skp"
+ },
+ {
+  "id": "horizon-607",
+  "design": "horizon",
+  "code": "607",
+  "tone": "607",
+  "hex": "#a09c91",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6X85BFRYY59C0P72DPSWX1.skp"
+ },
+ {
+  "id": "horizon-608",
+  "design": "horizon",
+  "code": "608",
+  "tone": "608",
+  "hex": "#9d9d9a",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6XA62ZB10CCXAD6MPKQCT0.skp"
+ },
+ {
+  "id": "horizon-609",
+  "design": "horizon",
+  "code": "609",
+  "tone": "609",
+  "hex": "#464c27",
+  "skp": "https://www.belgotex.com.br/storage/colors/skp/01KZ6XBQ0ZRR1DZFJJYRY4505Z.skp"
+ }
+]

@@ -1,0 +1,11 @@
+[
+  { "id": "01", "label": "Bege" },
+  { "id": "02", "label": "Marrom" },
+  { "id": "03", "label": "Azul claro" },
+  { "id": "04", "label": "Azul-marinho" },
+  { "id": "05", "label": "Cinza" },
+  { "id": "06", "label": "Grafite" },
+  { "id": "607", "label": "Areia", "exclusive": true },
+  { "id": "608", "label": "Cinza claro", "exclusive": true },
+  { "id": "609", "label": "Verde-oliva", "exclusive": true }
+]

@@ -1,0 +1,6 @@
+[
+  { "id": "recepcao", "label": "Recepção", "colors": ["frontier-202", "adventure-302", "odyssey-402"], "source": "Catálogo, p. 36" },
+  { "id": "estacoes", "label": "Estações de trabalho", "colors": ["frontier-206", "adventure-306"], "source": "Catálogo, p. 28" },
+  { "id": "lobby", "label": "Lobby", "colors": ["odyssey-403", "frontier-203"], "source": "Catálogo, p. 17" },
+  { "id": "lounge", "label": "Lounge", "colors": ["horizon-607", "horizon-609"], "source": "Catálogo, p. 34" }
+]

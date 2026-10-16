@@ -1,0 +1,468 @@
+---
+/**
+ * Ambientes: carrossel "squeeze" (adaptado do componente SqueezeCarousel, sem React nem Tailwind).
+ * Uma foto aberta recebe o espaço; as próximas vão se estreitando em colunas e terminam em lâminas finas
+ * à direita. Abrir uma lâmina a alarga e desliza a fila; o texto embaixo troca junto, em fade.
+ * Clicar na foto aberta amplia (dialog). As fotos ficam em <template> e o script monta os cartões
+ * (src/scripts/gallery.ts), então só as fotos à vista são baixadas.
+ */
+import QuoteLink from './QuoteLink.astro';
+import { Picture, getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { environments } from '../lib/data';
+import { environmentImages } from '../lib/images';
+
+const TYPE_LABEL: Record<string, string> = {
+  instalado: 'Instalado',
+  trabalho: 'Trabalho',
+  recepcao: 'Recepção e convivência',
+};
+
+const items = await Promise.all(
+  environments.map(async (env) => {
+    const src = environmentImages[env.id]!;
+    // fotos menores que 960 px (ex.: extraídas do catálogo) entram no tamanho original
+    const sizes = [960, 1600, 2400].filter((w) => w <= src.width);
+    if (!sizes.length) sizes.push(src.width);
+    const imgs = await Promise.all(
+      sizes.map((w) => getImage({ src, width: w, format: 'webp', quality: 76 })),
+    );
+    const widths = [480, 720, 960, 1280].filter((w) => w <= src.width);
+    return {
+      ...env,
+      src,
+      widths: widths.length ? widths : [src.width],
+      typeLabel: TYPE_LABEL[env.type] ?? '',
+      full: imgs.map((im, i) => `${im.src} ${sizes[i]}w`).join(', '),
+      fullDefault: imgs[0]!.src,
+    };
+  }),
+);
+---
+
+<section
+  id="ambientes"
+  class="section section--sand"
+  data-section-id="gallery"
+  aria-labelledby="ambientes-title"
+>
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Ambientes</p>
+      <h2 id="ambientes-title">Do lobby à diretoria.</h2>
+      <p class="lead">
+        Explore instalado e em projetos de escritórios, recepções e áreas de convivência. Abra uma foto pelas
+        faixas ao lado e toque na foto aberta para ver em tamanho grande; as legendas trazem as cores de cada
+        cena.
+      </p>
+    </div>
+
+    <div class="sq" data-gallery-root role="region" aria-roledescription="carrossel" aria-label="Ambientes com carpete Explore">
+      <div class="sq-bar">
+        <div class="filters" role="group" aria-label="Filtrar ambientes">
+          <button type="button" aria-pressed="true" data-filter="todos">Todos</button>
+          <button type="button" aria-pressed="false" data-filter="instalado">Instalado</button>
+          <button type="button" aria-pressed="false" data-filter="trabalho">Trabalho</button>
+          <button type="button" aria-pressed="false" data-filter="recepcao">Recepção e convivência</button>
+        </div>
+        <div class="sq-nav">
+          <span class="sq-count" aria-hidden="true" data-sq-count></span>
+          <button type="button" class="sq-arrow" data-sq-prev aria-label="Ambiente anterior">
+            <Icon name="prev" />
+          </button>
+          <button type="button" class="sq-arrow" data-sq-next aria-label="Próximo ambiente">
+            <Icon name="next" />
+          </button>
+        </div>
+      </div>
+
+      <div class="sq-row">
+        <div class="sq-strip" role="tablist" aria-label="Ambientes" aria-orientation="horizontal" data-sq-strip></div>
+      </div>
+
+      <div class="sq-panel" id="sq-panel" role="tabpanel" data-sq-panel>
+        {items.map((it, i) => (
+          <div class="sq-copy" data-sq-copy={i} aria-hidden="true">
+            <p class="sq-text">
+              <span class="sq-t">{it.caption}.</span> <span class="sq-d">{it.alt}.</span>
+            </p>
+            <button
+              type="button"
+              class="sq-act"
+              data-sample-open
+              data-sample-color={it.colors.length ? it.colors.join(' ') : undefined}
+              data-loc="gallery"
+              data-cta="sample"
+              data-cta-id="sample_gallery"
+              tabindex="-1"
+            >
+              {it.colors.length > 1 ? 'Pedir amostra destas cores' : it.colors.length ? 'Pedir amostra desta cor' : 'Pedir amostra'}
+              <svg width="6" height="9" viewBox="0 0 6 9" fill="none" aria-hidden="true">
+                <path d="M1.2 1 4.7 4.5 1.2 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+      <p class="sr-only" aria-live="polite" aria-atomic="true" data-sq-live></p>
+
+      {items.map((it, i) => (
+        <template
+          data-sq-slide={i}
+          data-type={it.type}
+          data-caption={it.caption}
+          data-alt={it.alt}
+          data-full={it.full}
+          data-full-default={it.fullDefault}
+        >
+          <Picture
+            src={it.src}
+            formats={['avif', 'webp']}
+            widths={it.widths}
+            sizes="(min-width: 900px) 680px, 70vw"
+            alt={it.alt}
+            loading="lazy"
+            quality={70}
+            class="sq-pic"
+          />
+          <span class="sq-over" aria-hidden="true">
+            <span class="sq-type">{it.typeLabel}</span>
+            <span class="sq-zoom">Ampliar</span>
+          </span>
+        </template>
+      ))}
+    </div>
+
+    <div class="actions after">
+      <QuoteLink class="btn btn--primary" loc="gallery" />
+    </div>
+  </div>
+
+  <dialog class="lightbox" data-lightbox aria-labelledby="lb-caption">
+    <div class="lb-inner">
+      <img data-lb-img alt="" sizes="(min-width: 1100px) 1040px, 94vw" />
+      <div class="lb-bar">
+        <p id="lb-caption" data-lb-caption></p>
+        <div class="lb-nav">
+          <button type="button" class="btn btn--secondary btn--sm" data-lb-prev aria-label="Foto anterior">
+            <Icon name="prev" />
+          </button>
+          <button type="button" class="btn btn--secondary btn--sm" data-lb-next aria-label="Próxima foto">
+            <Icon name="next" />
+          </button>
+          <button type="button" class="btn btn--primary btn--sm" data-lb-close>
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<style>
+  /* O carrossel mede a largura que recebe (container), não a da janela */
+  .sq {
+    container-type: inline-size;
+    --sq-ms: 1000ms;
+    --sq-ease: cubic-bezier(0.16, 1, 0.3, 1); /* easeOutExpo */
+  }
+  .sq-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .filters button {
+    min-height: 44px;
+    padding: 0 1.125rem;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .filters button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .sq-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .sq-count {
+    min-width: 4.5rem;
+    text-align: right;
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+  .sq-arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .sq-arrow:hover {
+    opacity: 0.85;
+  }
+  .sq-arrow:focus-visible,
+  .sq-act:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .sq-arrow :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+  .sq-arrow[hidden] {
+    display: none;
+  }
+
+  /* A fila: 4 colunas que dividem o espaço que sobra e uma cauda de lâminas */
+  .sq-row {
+    --sq-h: clamp(220px, 32cqi, 380px);
+    --sq-ratio: 1.7778; /* 16:9: tamanho da foto aberta e escala de todas as fotos */
+    --sq-gap: 16px;
+    --sq-slat: 8px;
+    --sq-slat-gap: 8px;
+    --sq-slats: 3; /* lido pelo script */
+    --sq-hero: calc(var(--sq-h) * var(--sq-ratio));
+    /* --sq-n (lâminas em uso) e --sq-k (colunas em uso) vêm do script */
+    --sq-room: calc(
+      100cqi - var(--sq-hero) - var(--sq-n, 3) * (var(--sq-slat) + var(--sq-slat-gap)) - (var(--sq-k, 4) - 1) *
+        var(--sq-gap)
+    );
+    height: var(--sq-h);
+    overflow: hidden;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  @container (max-width: 639px) {
+    .sq-row {
+      --sq-h: 62cqi;
+      --sq-ratio: 1.08;
+      --sq-gap: 8px;
+      --sq-slat: 6px;
+      --sq-slat-gap: 6px;
+      --sq-slats: 2;
+    }
+  }
+  .sq-strip {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    transition: transform var(--sq-ms) var(--sq-ease);
+  }
+  .sq-strip :global(.sq-card) {
+    position: relative;
+    isolation: isolate;
+    flex-shrink: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: var(--stone);
+    cursor: pointer;
+    transition-property: width, margin-left, border-radius;
+    transition-duration: var(--sq-ms);
+    transition-timing-function: var(--sq-ease);
+  }
+  .sq-strip :global(.sq-card.is-front) {
+    cursor: zoom-in;
+  }
+  .sq-strip :global(.sq-card:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+  }
+  /* Troca sem animação (montagem e acerto da fila depois de cada passo) */
+  .sq-strip[data-still],
+  .sq-strip[data-still] :global(.sq-card) {
+    transition: none !important;
+  }
+  /* A foto tem sempre a largura da foto aberta e fica centrada: o cartão só muda o quanto aparece dela,
+     então a foto não muda de escala no meio do deslize */
+  .sq-strip :global(picture) {
+    display: contents;
+  }
+  .sq-strip :global(.sq-pic) {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--sq-hero);
+    min-width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .sq-strip :global(.sq-over) {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 4rem 1.25rem 1.125rem;
+    background-image: linear-gradient(to top, rgb(0 0 0 / 0.55), transparent);
+    color: #fff;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--sq-ms) var(--sq-ease);
+  }
+  .sq-strip :global(.sq-card.is-front .sq-over) {
+    opacity: 1;
+  }
+  .sq-strip :global(.sq-zoom) {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgb(255 255 255 / 0.6);
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  @container (max-width: 639px) {
+    .sq-strip :global(.sq-over) {
+      padding: 3rem 0.875rem 0.875rem;
+    }
+  }
+
+  /* Texto embaixo: todos empilhados na mesma célula, só o da foto aberta aparece */
+  .sq-panel {
+    display: grid;
+    margin-top: 1.5rem;
+  }
+  .sq-copy {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--sq-ms) var(--sq-ease),
+      visibility var(--sq-ms);
+  }
+  .sq-copy.on {
+    opacity: 1;
+    visibility: visible;
+  }
+  @container (min-width: 760px) {
+    .sq-copy {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 2.5rem;
+    }
+  }
+  .sq-text {
+    margin: 0;
+    max-width: 46rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+  .sq-t {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .sq-d {
+    color: var(--ink-2);
+  }
+  .sq-act {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.125rem;
+    border: 0;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .sq-act:hover {
+    opacity: 0.85;
+  }
+  .sq-act svg {
+    transition: transform 0.2s;
+  }
+  .sq-act:hover svg {
+    transform: translateX(2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sq {
+      --sq-ms: 0ms;
+    }
+  }
+
+  .after {
+    margin-top: 2.5rem;
+  }
+  .lightbox {
+    border: 0;
+    padding: 0;
+    background: var(--paper);
+    max-width: min(1100px, 94vw);
+    width: 100%;
+    max-height: 94vh;
+  }
+  .lightbox::backdrop {
+    background: rgb(20 18 17 / 0.82);
+  }
+  .lb-inner {
+    padding: 12px;
+    display: grid;
+    gap: 12px;
+  }
+  .lb-inner img {
+    width: 100%;
+    max-height: calc(94vh - 110px);
+    object-fit: contain;
+    background: var(--sand);
+  }
+  .lb-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .lb-nav {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .lb-nav :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+<script>
+  import { initGallery } from '../scripts/gallery';
+  initGallery();
+</script>

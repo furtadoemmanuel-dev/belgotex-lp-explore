@@ -1,0 +1,499 @@
+---
+import QuoteLink from './QuoteLink.astro';
+import { getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import MoltenSeals from './MoltenSeals.astro';
+import { badges, specs, documents } from '../lib/data';
+import { badgeImages } from '../lib/images';
+
+const badgeList = await Promise.all(
+  badges.map(async (b) => {
+    const src = badgeImages[b.id]!;
+    const w = Math.min(192, src.width);
+    return { ...b, img: await getImage({ src, width: w, height: w, format: 'webp' }) };
+  }),
+);
+// Selos organizados em grupos, cada grupo um card expansivo
+const groups = [
+  { id: 'garantia', title: 'Garantia', lead: 'Fabricação e performance.' },
+  { id: 'desempenho', title: 'Desempenho', lead: 'Uso comercial pesado e rastreabilidade.' },
+  { id: 'certificacoes', title: 'Certificações', lead: 'Gestão da qualidade e ambiental certificadas.' },
+  { id: 'saude', title: 'Saúde e sustentabilidade', lead: 'Proteção antibacteriana e produção nacional.' },
+].map((g) => ({ ...g, items: badgeList.filter((b) => b.group === g.id) }));
+// Anel dos selos: arte maior (vira textura num card de ~300 px) e o grupo de cada selo como legenda
+const ringSeals = await Promise.all(
+  groups.flatMap((g) =>
+    g.items.map(async (b) => {
+      const src = badgeImages[b.id]!;
+      const w = Math.min(360, src.width);
+      const img = await getImage({ src, width: w, height: w, format: 'webp' });
+      return { src: img.src, label: b.label, group: g.title, text: b.text };
+    }),
+  ),
+);
+const docs = documents;
+---
+
+<section id="garantia" class="section section--sand" data-section-id="trust" aria-labelledby="garantia-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="garantia-title">Garantia, certificações e documentos</h2>
+      <p class="lead">
+        O Explore é garantido pela Belgotex do Brasil contra qualquer defeito latente de fabricação.
+      </p>
+    </div>
+    <div class="warranty">
+      <div>
+        <p class="w-big">5 anos</p>
+        <p>Garantia de fabricação, contra qualquer defeito latente de fabricação.</p>
+      </div>
+      <div>
+        <p class="w-big">10 anos</p>
+        <p>Garantia de performance, conforme o selo do catálogo Explore.</p>
+        <p class="small"><span class="pending">[[PENDENTE: condições da garantia de performance de 10 anos]]</span></p>
+      </div>
+    </div>
+  </div>
+
+  <MoltenSeals seals={ringSeals} />
+
+  <div class="container">
+    <h3 class="sr-only">Selos e certificações</h3>
+    <ul class="groups">
+      {groups.map((g) => (
+        <li>
+          <details class="group" data-badge-group={g.id}>
+            <summary>
+              <span class="g-text">
+                <span class="g-title">{g.title}</span>
+                <span class="g-lead">{g.lead}</span>
+              </span>
+              <span class="g-toggle" aria-hidden="true" />
+              <span class="g-foot">
+                <span class="g-preview" aria-hidden="true">
+                  {g.items.slice(0, 3).map((b) => (
+                    <img src={b.img.src} width="44" height="44" alt="" loading="lazy" decoding="async" />
+                  ))}
+                </span>
+                <span class="g-count">{g.items.length} selos</span>
+              </span>
+            </summary>
+            <ul class="g-items">
+              {g.items.map((b) => (
+                <li>
+                  <img src={b.img.src} width="96" height="96" alt="" loading="lazy" decoding="async" />
+                  <span>
+                    <strong>{b.label}</strong>
+                    <span class="g-desc">{b.text}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </li>
+      ))}
+    </ul>
+
+    <details class="acc">
+      <summary>Ver todas as especificações técnicas</summary>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Tabela de especificações técnicas">
+        <table>
+          <caption class="sr-only">Especificações técnicas do carpete modular Explore</caption>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Explore</th>
+            </tr>
+          </thead>
+          <tbody>
+            {specs.rows.map((r) => (
+              <tr>
+                <th scope="row">{r[0]}</th>
+                {r.slice(1).map((v) => (
+                  <td>{v}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted note">
+        {specs.source} {specs.note}
+      </p>
+      <p class="small note">
+        <span class="pending">{specs.pending}</span>
+      </p>
+    </details>
+    <details class="acc">
+      <summary>Documentos para download</summary>
+      <ul class="doclist">
+        {docs.map((d) => (
+          <li>
+            <a
+              href={d.url}
+              target="_blank"
+              rel="noopener"
+              data-doc={d.id}
+              data-cta="document"
+              data-cta-id={`document_${d.id}`}
+              data-loc="trust"
+            >
+              <Icon name={d.meta === 'PDF' ? 'download' : 'external'} />
+              {d.label}
+              <span class="small muted"> · {d.meta}</span>
+              <span class="sr-only"> (abre em nova aba)</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+    <div class="actions after">
+      <QuoteLink class="btn btn--primary" loc="trust" />
+    </div>
+  </div>
+</section>
+<style>
+  .warranty {
+    display: grid;
+    gap: var(--col-gap);
+    grid-template-columns: 1fr;
+    margin-bottom: 3rem;
+  }
+  @media (min-width: 640px) {
+    .warranty {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .warranty > div {
+    border-top: 1.5px solid var(--ink);
+    padding-top: 1.25rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .w-big {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 2rem + 2.5vw, 4.25rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  /* Cards expansivos dos selos */
+  .groups {
+    list-style: none;
+    margin: 0 0 3rem;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+    /* cards fechados da mesma linha com a mesma altura */
+    align-items: stretch;
+  }
+  .groups > li {
+    display: flex;
+  }
+  .groups > li > .group {
+    flex: 1;
+  }
+  @media (min-width: 900px) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+  }
+  /* Aberto, o card ocupa a linha inteira e os selos se organizam em colunas */
+  @media (min-width: 900px) {
+    .groups > li:has(.group[open]) {
+      grid-column: 1 / -1;
+    }
+    .group[open] .g-items {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem 2rem;
+    }
+  }
+  @media (min-width: 1200px) {
+    .group[open] .g-items {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .group {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover {
+      border-color: var(--cool-6);
+      box-shadow: 0 12px 24px -18px rgba(35, 31, 32, 0.45);
+    }
+  }
+  .group[open] {
+    border-color: var(--ink);
+    box-shadow: 0 16px 32px -22px rgba(35, 31, 32, 0.55);
+  }
+  /* Mesmo desenho nos quatro cards: título e frase em cima (largura toda, para o título não quebrar),
+     selos e contagem embaixo, "+" à direita */
+  .group summary {
+    list-style: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'text toggle'
+      'foot foot';
+    align-items: start;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem 1.1rem;
+    min-height: 44px;
+    height: 100%;
+  }
+  @media (min-width: 900px) {
+    .group:not([open]) summary {
+      min-height: 10.5rem;
+    }
+  }
+  .group summary:focus-visible {
+    outline-offset: -3px;
+  }
+  .g-text {
+    grid-area: text;
+    display: grid;
+    gap: 0.2rem;
+  }
+  .g-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2rem);
+    line-height: 1.1;
+  }
+  .g-lead {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .g-foot {
+    grid-area: foot;
+    align-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--line);
+  }
+  .g-preview {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .g-preview img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+  .g-count {
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  /* "+" que gira para "×" */
+  .g-toggle {
+    grid-area: toggle;
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color 0.25s,
+      border-color 0.25s;
+  }
+  .g-toggle::before,
+  .g-toggle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    background: var(--ink);
+    transform: translate(-50%, -50%);
+  }
+  .g-toggle::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .group[open] .g-toggle {
+    transform: rotate(45deg);
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .group[open] .g-toggle::before,
+  .group[open] .g-toggle::after {
+    background: var(--paper);
+  }
+  .g-items {
+    list-style: none;
+    margin: 0 1.25rem;
+    padding: 1.25rem 0;
+    display: grid;
+    gap: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  @media (max-width: 479px) {
+    .g-items {
+      margin: 0 1rem;
+    }
+  }
+  .g-items li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+  }
+  .g-items img {
+    width: clamp(64px, 52px + 2vw, 88px);
+    height: clamp(64px, 52px + 2vw, 88px);
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+  .g-items strong {
+    display: block;
+    font-weight: 600;
+  }
+  .g-desc {
+    display: block;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .group::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+        content-visibility 0.4s allow-discrete;
+    }
+    .group[open]::details-content {
+      block-size: auto;
+      block-size: calc-size(auto, size);
+    }
+    .group[open] .g-items li {
+      animation: g-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .group[open] .g-items li:nth-child(2) {
+      animation-delay: 0.05s;
+    }
+    .group[open] .g-items li:nth-child(3) {
+      animation-delay: 0.1s;
+    }
+    .group[open] .g-items li:nth-child(4) {
+      animation-delay: 0.15s;
+    }
+    .group[open] .g-items li:nth-child(5) {
+      animation-delay: 0.2s;
+    }
+    .group[open] .g-items li:nth-child(6) {
+      animation-delay: 0.25s;
+    }
+    @keyframes g-in {
+      from {
+        transform: translateY(8px);
+      }
+    }
+  }
+  .acc {
+    border-top: 1px solid var(--ink);
+  }
+  .acc:last-of-type {
+    border-bottom: 1px solid var(--ink);
+  }
+  .acc summary {
+    cursor: pointer;
+    padding: 1.25rem 0;
+    font-weight: 600;
+    font-size: 1.0625rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .acc summary::after {
+    content: '+';
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1;
+    font-weight: 400;
+  }
+  .acc[open] summary::after {
+    content: '−';
+  }
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+    min-width: 0;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.625rem 0.75rem 0.625rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  thead th {
+    font-weight: 600;
+    border-bottom: 1px solid var(--ink);
+  }
+  tbody th {
+    font-weight: 500;
+  }
+  .note {
+    padding-bottom: 1.5rem;
+    max-width: 90ch;
+  }
+  .doclist {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 1.25rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .doclist a {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .doclist a:hover {
+    text-decoration: underline;
+  }
+  .doclist :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+  .after {
+    margin-top: 2.5rem;
+  }
+</style>
+
+<script>
+  import { track } from '../scripts/analytics';
+
+  document.querySelectorAll<HTMLDetailsElement>('[data-badge-group]').forEach((d) =>
+    d.addEventListener('toggle', () => {
+      if (d.open) track('badge_group_expand', { group: d.dataset.badgeGroup });
+    }),
+  );
+</script>

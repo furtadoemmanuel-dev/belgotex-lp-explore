@@ -1,0 +1,231 @@
+---
+/**
+ * Faixa de texturas abaixo do hero como um cilindro 3D (adaptado do ThreeDPhotoCarousel, sem React nem
+ * framer-motion; src/scripts/cylinder.ts). As placas ficam em volta de um cilindro que gira devagar sozinho;
+ * arrastar gira com inércia, e tocar numa placa a amplia por cima da página, saindo do lugar dela.
+ * Uma placa de cada design em dois tons, mais as três exclusivas Horizon.
+ */
+import { getImage } from 'astro:assets';
+import { colors, colorName } from '../lib/data';
+import { colorImages } from '../lib/images';
+
+const ids = [
+  'journey-101',
+  'frontier-202',
+  'adventure-303',
+  'odyssey-404',
+  'navigator-505',
+  'horizon-606',
+  'horizon-607',
+  'journey-104',
+  'frontier-205',
+  'adventure-306',
+  'odyssey-401',
+  'navigator-502',
+  'horizon-603',
+  'horizon-609',
+];
+const faces = await Promise.all(
+  ids.map(async (id) => {
+    const c = colors.find((x) => x.id === id)!;
+    const src = colorImages[id]!;
+    const [thumb, big] = await Promise.all([
+      getImage({ src, width: 240, height: 240, fit: 'cover', format: 'webp', quality: 72 }),
+      getImage({ src, width: Math.min(900, src.width), format: 'webp', quality: 80 }),
+    ]);
+    return { id, name: colorName(c), thumb: thumb.src, big: big.src };
+  }),
+);
+---
+
+<div class="cyl" data-cyl style={`--n:${faces.length}`}>
+  <div class="cyl-scene" data-cyl-scene>
+    <div class="cyl-ring" data-cyl-ring>
+      {faces.map((f, i) => (
+        <button
+          type="button"
+          class="cyl-face"
+          style={`--i:${i}`}
+          data-cyl-face
+          data-big={f.big}
+          data-name={f.name}
+          aria-label={`Ampliar a textura ${f.name}`}
+        >
+          <img src={f.thumb} width="240" height="240" alt="" loading="lazy" decoding="async" draggable="false" />
+        </button>
+      ))}
+    </div>
+  </div>
+  <p class="cyl-hint small">
+    <span class="cyl-hint-fine">Arraste para girar · clique numa placa para ampliar</span>
+    <span class="cyl-hint-touch">Arraste para os lados · toque numa placa para ampliar</span>
+  </p>
+
+  <dialog class="cyl-dlg" data-cyl-dialog aria-labelledby="cyl-cap">
+    <figure class="cyl-fig">
+      <img data-cyl-big alt="" />
+      <figcaption id="cyl-cap" data-cyl-cap></figcaption>
+    </figure>
+    <button type="button" class="cyl-close" data-cyl-close aria-label="Fechar">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+    </button>
+  </dialog>
+</div>
+
+<style>
+  .cyl {
+    /* Largura do cilindro "aberto": define o tamanho de cada placa e o raio */
+    --cw: 1100px;
+    --fw: calc(var(--cw) / var(--n));
+    --radius: calc(var(--cw) / 6.2832);
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+  @media (min-width: 641px) {
+    .cyl {
+      --cw: 1800px;
+    }
+  }
+  .cyl-scene {
+    position: relative;
+    height: calc(var(--fw) * 1.9);
+    display: grid;
+    place-items: center;
+    perspective: 1000px;
+    overflow: hidden;
+    touch-action: pan-y; /* arrastar para os lados gira; para cima e para baixo rola a página */
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    /* as bordas somem num degradê, para o cilindro não parecer cortado */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .cyl-scene:active {
+    cursor: grabbing;
+  }
+  .cyl-ring {
+    position: relative;
+    width: var(--fw);
+    height: var(--fw);
+    transform-style: preserve-3d;
+    transform: rotateY(var(--rot, 0deg));
+    will-change: transform;
+  }
+  .cyl-face {
+    position: absolute;
+    inset: 0;
+    padding: 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    transform: rotateY(calc(var(--i) * 360deg / var(--n))) translateZ(var(--radius));
+    opacity: var(--o, 1);
+    filter: brightness(var(--b, 1));
+  }
+  .cyl-face img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    pointer-events: none;
+    box-shadow: 0 10px 22px -14px rgb(35 31 32 / 0.6);
+  }
+  .cyl-face:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .cyl-hint {
+    margin: 0.75rem auto 0;
+    max-width: none;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .cyl-hint-touch {
+    display: none;
+  }
+  @media (hover: none) {
+    .cyl-hint-fine {
+      display: none;
+    }
+    .cyl-hint-touch {
+      display: inline;
+    }
+  }
+
+  /* Ampliação */
+  .cyl-dlg {
+    width: min(92vw, 640px);
+    max-height: 92vh;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    overflow: visible;
+  }
+  .cyl-dlg::backdrop {
+    background: rgb(20 18 17 / 0.72);
+    animation: cyl-fade 0.4s ease both;
+  }
+  .cyl-dlg.is-closing::backdrop {
+    animation: cyl-fade 0.35s ease reverse both;
+  }
+  @keyframes cyl-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  .cyl-fig {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .cyl-fig img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #2b2825;
+    box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.7);
+  }
+  .cyl-fig figcaption {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    text-align: center;
+  }
+  .cyl-close {
+    position: absolute;
+    top: -0.75rem;
+    right: -0.75rem;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 6px 16px -6px rgb(0 0 0 / 0.5);
+  }
+  .cyl-close svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cyl-dlg::backdrop {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { initCylinder } from '../scripts/cylinder';
+  initCylinder();
+</script>

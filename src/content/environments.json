@@ -1,0 +1,112 @@
+[
+ {
+  "id": "obra-3",
+  "type": "instalado",
+  "colors": [
+   "frontier-203"
+  ],
+  "alt": "Escritório corporativo com carpete Explore Frontier 203 em tons de azul, mesas de trabalho e floreira",
+  "caption": "Escritório · Frontier 203"
+ },
+ {
+  "id": "obra-5",
+  "type": "instalado",
+  "colors": [
+   "frontier-203"
+  ],
+  "alt": "Área de convivência com pufes sobre carpete Explore Frontier 203",
+  "caption": "Convivência · Frontier 203"
+ },
+ {
+  "id": "obra-2",
+  "type": "instalado",
+  "colors": [
+   "frontier-203"
+  ],
+  "alt": "Open office com Explore Frontier 203 e faixa em 3 Tonos Cinza Claro",
+  "caption": "Open office · Frontier 203 + 3 Tonos Cinza Claro"
+ },
+ {
+  "id": "recepcao-frontier-202-adventure-302",
+  "type": "recepcao",
+  "colors": [
+   "frontier-202",
+   "adventure-302"
+  ],
+  "alt": "Recepção corporativa com balcão branco e carpete Explore em tons de marrom",
+  "caption": "Recepção · Frontier 202 + Adventure 302"
+ },
+ {
+  "id": "lobby-odyssey-403-frontier-203",
+  "type": "recepcao",
+  "colors": [
+   "odyssey-403",
+   "frontier-203"
+  ],
+  "alt": "Lobby com parede de concreto e carpete Explore em azul claro, combinando dois designs",
+  "caption": "Lobby · Odyssey 403 + Frontier 203"
+ },
+ {
+  "id": "lounge-horizon-608-609",
+  "type": "recepcao",
+  "colors": [
+   "horizon-608",
+   "horizon-609"
+  ],
+  "alt": "Lounge com sofás orgânicos e faixa curva de carpete verde-oliva sobre carpete cinza claro",
+  "caption": "Lounge · Horizon 608 + 609"
+ },
+ {
+  "id": "open-office-adventure-305",
+  "type": "trabalho",
+  "colors": [
+   "adventure-305"
+  ],
+  "alt": "Open office com estações brancas e carpete Explore Adventure 305 cinza",
+  "caption": "Open office · Adventure 305"
+ },
+ {
+  "id": "estacoes-frontier-206-adventure-306",
+  "type": "trabalho",
+  "colors": [
+   "frontier-206",
+   "adventure-306"
+  ],
+  "alt": "Estação de trabalho vista de cima com carpete Explore grafite",
+  "caption": "Estações · Frontier 206 + Adventure 306"
+ },
+ {
+  "id": "diretoria-navigator-506",
+  "type": "trabalho",
+  "colors": [
+   "navigator-506"
+  ],
+  "alt": "Sala de diretoria com estante vermelha e carpete Explore Navigator 506 grafite",
+  "caption": "Diretoria · Navigator 506"
+ },
+ {
+  "id": "sala-reuniao",
+  "type": "trabalho",
+  "colors": [],
+  "alt": "Sala de reunião envidraçada com carpete Explore grafite",
+  "caption": "Sala de reunião"
+ },
+ {
+  "id": "lounge-horizon-607",
+  "type": "recepcao",
+  "colors": [
+   "horizon-607"
+  ],
+  "alt": "Lounge com sofá e mesas cobre sobre carpete Explore Horizon 607 areia",
+  "caption": "Lounge · Horizon 607"
+ },
+ {
+  "id": "cafe-journey-102",
+  "type": "recepcao",
+  "colors": [
+   "journey-102"
+  ],
+  "alt": "Balcão de café com banquetas sobre carpete Explore Journey 102 marrom",
+  "caption": "Café · Journey 102"
+ }
+]

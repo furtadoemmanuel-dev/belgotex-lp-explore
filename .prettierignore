@@ -1,0 +1,11 @@
+dist
+node_modules
+wireframe
+docs
+src/assets/brand
+qa/screens
+public/favicon.svg
+src/content
+*.md
+test-results
+playwright-report

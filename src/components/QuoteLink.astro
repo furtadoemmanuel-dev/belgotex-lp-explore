@@ -1,0 +1,28 @@
+---
+// "Solicitar cotação": leva direto ao site da Belgotex (QUOTE_URL), sem formulário na LP.
+// Os parâmetros UTM identificam a LP e o botão de origem no site; nenhum dado pessoal vai na URL.
+import { config } from '../config';
+
+interface Props {
+  loc: string;
+  class?: string;
+  [attr: `data-${string}`]: string | boolean | undefined;
+}
+const { loc, class: cls, ...rest } = Astro.props;
+const url = new URL(config.quoteUrl);
+url.searchParams.set('utm_source', 'lp-explore');
+url.searchParams.set('utm_medium', 'landing-page');
+url.searchParams.set('utm_campaign', config.campaignCode.toLowerCase());
+url.searchParams.set('utm_content', loc);
+---
+
+<a
+  class={cls}
+  href={url.href}
+  target="_blank"
+  rel="noopener"
+  data-cta="quote"
+  data-cta-id={`quote_${loc}`}
+  data-loc={loc}
+  {...rest}
+><slot>Solicitar cotação</slot><span class="sr-only"> (abre o site da Belgotex em nova aba)</span></a>
