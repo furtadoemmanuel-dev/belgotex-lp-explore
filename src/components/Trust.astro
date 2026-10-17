@@ -2,7 +2,7 @@
 import QuoteLink from './QuoteLink.astro';
 import { getImage } from 'astro:assets';
 import Icon from './Icon.astro';
-import MoltenSeals from './MoltenSeals.astro';
+import SealTimeline from './SealTimeline.astro';
 import { badges, specs, documents } from '../lib/data';
 import { badgeImages } from '../lib/images';
 
@@ -20,7 +20,7 @@ const groups = [
   { id: 'certificacoes', title: 'Certificações', lead: 'Gestão da qualidade e ambiental certificadas.' },
   { id: 'saude', title: 'Saúde e sustentabilidade', lead: 'Proteção antibacteriana e produção nacional.' },
 ].map((g) => ({ ...g, items: badgeList.filter((b) => b.group === g.id) }));
-// Anel dos selos: arte maior (vira textura num card de ~300 px) e o grupo de cada selo como legenda
+// Linha do tempo dos selos: arte de cada selo e o grupo dele como legenda
 const ringSeals = await Promise.all(
   groups.flatMap((g) =>
     g.items.map(async (b) => {
@@ -55,7 +55,7 @@ const docs = documents;
     </div>
   </div>
 
-  <MoltenSeals seals={ringSeals} />
+  <SealTimeline seals={ringSeals} />
 
   <div class="container">
     <h3 class="sr-only">Selos e certificações</h3>

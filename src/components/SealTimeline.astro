@@ -1,0 +1,340 @@
+---
+/**
+ * Selos e certificações numa linha do tempo horizontal (adaptada do Timeline da Hyperiux Vault, sem React, GSAP
+ * nem SplitText; src/scripts/sealtimeline.ts). A seção fica presa na tela enquanto a rolagem desliza a faixa para
+ * o lado: a linha central se estende, e cada selo, ao chegar perto do centro, ergue a haste, acende o ponto e
+ * revela o texto subindo por trás de uma máscara. Os selos alternam acima e abaixo da linha.
+ * No celular a linha fica na vertical e cada selo aparece ao entrar na tela.
+ * Sem JavaScript ou com movimento reduzido, tudo aparece pronto, sem prender a rolagem.
+ */
+import { Picture } from 'astro:assets';
+import { environmentImages } from '../lib/images';
+
+interface Seal {
+  src: string;
+  label: string;
+  group: string;
+  text: string;
+}
+interface Props {
+  seals: Seal[];
+}
+const { seals } = Astro.props;
+const groups = [...new Set(seals.map((s) => s.group))];
+---
+
+<div class="st" data-st>
+  <div class="st-pin" data-st-pin>
+    <div class="st-track" data-st-track>
+      <div class="st-intro">
+        <p class="st-eyebrow">Selos e certificações</p>
+        <h3 class="st-title">{seals.length} selos, {groups.length} frentes.</h3>
+        <p class="st-period">{groups.join(' · ')}</p>
+        <div class="st-photo">
+          <Picture
+            src={environmentImages['obra-2']!}
+            formats={['avif', 'webp']}
+            widths={[480, 720]}
+            sizes="(min-width: 760px) 300px, 90vw"
+            alt="Open office com carpete Explore Frontier 203"
+            loading="lazy"
+            quality={70}
+          />
+        </div>
+      </div>
+
+      <div class="st-line-wrap">
+        <div class="st-line" aria-hidden="true">
+          <span class="st-cap"></span>
+          <span class="st-line-fill" data-st-line></span>
+          <span class="st-cap"></span>
+        </div>
+        <ol class="st-items">
+          {seals.map((s, i) => (
+            <li class={`st-item ${i % 2 ? 'st-item--down' : 'st-item--up'}`} style={`--i:${i}`} data-st-item>
+              <span class="st-stem" aria-hidden="true"></span>
+              <span class="st-dot" aria-hidden="true"></span>
+              <div class="st-card">
+                <img src={s.src} width="64" height="64" alt="" loading="lazy" decoding="async" />
+                <span class="st-mask"><span class="st-label">{s.label}</span></span>
+                <span class="st-mask"><span class="st-desc"><b>{s.group}.</b> {s.text}</span></span>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .st {
+    --st-accent: var(--ink);
+    --st-h: min(620px, calc(100svh - 68px - 3rem)); /* altura útil da faixa abaixo do cabeçalho */
+    --st-gap: 230px; /* distância entre dois selos na linha */
+    position: relative;
+    margin-block: clamp(1rem, 0.5rem + 2vw, 2.5rem) clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+  .st-pin {
+    position: relative;
+  }
+  .st-track {
+    /* mesma cor da seção: o deslize vira uma camada própria e o "multiply" dos selos precisa de fundo nela */
+    background: var(--sand);
+    display: flex;
+    align-items: center;
+    gap: clamp(2rem, 4vw, 4.5rem);
+    padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+  }
+  .st-intro {
+    flex: none;
+    width: 300px;
+    display: grid;
+    gap: 0.75rem;
+    align-content: center;
+  }
+  .st-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .st-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.75rem);
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .st-period {
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .st-photo {
+    margin-top: 0.75rem;
+    aspect-ratio: 4 / 5;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--stone);
+  }
+  .st-photo :global(picture),
+  .st-photo :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 100%;
+  }
+
+  /* Faixa da linha: altura fixa; os selos de cima ficam acima da linha, os de baixo abaixo */
+  .st-line-wrap {
+    position: relative;
+    flex: none;
+    height: var(--st-h);
+    width: calc(var(--st-gap) * (var(--n, 10) - 1) + 280px);
+  }
+  .st-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+  }
+  .st-cap {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--st-accent);
+  }
+  .st-line-fill {
+    flex: 1;
+    height: 1px;
+    background: var(--st-accent);
+    transform-origin: 0 50%;
+    transform: scaleX(var(--line, 1));
+  }
+  .st-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .st-item {
+    --r: 1; /* 0 → 1 conforme o selo chega ao centro (vem do script) */
+    position: absolute;
+    left: calc(60px + var(--i) * var(--st-gap));
+    width: 250px;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+  }
+  .st-item--up {
+    top: 0;
+    justify-content: flex-start;
+  }
+  .st-item--down {
+    bottom: 0;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+  }
+  /* Haste: liga o texto ao ponto na linha */
+  .st-stem {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    background: var(--st-accent);
+    transform: scaleY(var(--r));
+  }
+  .st-item--up .st-stem {
+    top: 0.5rem;
+    bottom: 0;
+    transform-origin: 50% 100%;
+  }
+  .st-item--down .st-stem {
+    top: 0;
+    bottom: 0.5rem;
+    transform-origin: 50% 0;
+  }
+  .st-dot {
+    position: absolute;
+    left: -5px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--st-accent);
+    transform: scale(var(--r));
+  }
+  .st-item--up .st-dot {
+    bottom: -5.5px;
+  }
+  .st-item--down .st-dot {
+    top: -5.5px;
+  }
+  .st-card {
+    display: grid;
+    gap: 0.4rem;
+    padding-left: 1.1rem;
+    padding-block: 0.25rem;
+  }
+  .st-card img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    margin-bottom: 0.25rem;
+    opacity: var(--r);
+    transform: translateY(calc((1 - var(--r)) * 12px));
+  }
+  /* Texto sobe por trás de uma máscara, como as linhas do SplitText */
+  .st-mask {
+    display: block;
+    overflow: hidden;
+  }
+  .st-label,
+  .st-desc {
+    display: block;
+    transform: translateY(calc((1 - var(--r)) * 105%));
+  }
+  .st-label {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .st-desc {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .st-desc b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Com o script: a seção ganha altura de rolagem e a faixa fica presa no topo */
+  .st.is-pinned .st-pin {
+    position: sticky;
+    top: 68px; /* abaixo do cabeçalho fixo */
+    height: calc(100svh - 68px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .st.is-pinned .st-track {
+    will-change: transform;
+    /* sobra no fim: o último selo termina o deslize perto do meio da tela, já todo revelado */
+    padding-right: max(var(--gutter), calc(55vw - 250px));
+  }
+
+  /* Sem o modo preso (sem script, movimento reduzido): a faixa rola para o lado dentro da seção */
+  .st:not(.is-pinned):not(.is-vertical) .st-pin {
+    overflow-x: auto;
+    padding-block: 1rem;
+  }
+
+  /* Celular: linha vertical à esquerda, selos empilhados */
+  .st.is-vertical .st-track {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
+  .st.is-vertical .st-intro {
+    width: auto;
+  }
+  .st.is-vertical .st-photo {
+    aspect-ratio: 4 / 3;
+  }
+  .st.is-vertical .st-line-wrap {
+    height: auto;
+    width: auto;
+    padding-left: 1.25rem;
+  }
+  .st.is-vertical .st-line {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: 8px;
+    flex-direction: column;
+    transform: none;
+  }
+  .st.is-vertical .st-line-fill {
+    width: 1px;
+    height: auto;
+    transform-origin: 50% 0;
+    transform: scaleY(var(--line, 1));
+  }
+  .st.is-vertical .st-items {
+    display: grid;
+    gap: 2rem;
+  }
+  .st.is-vertical .st-item {
+    position: relative;
+    left: auto;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    flex-direction: column;
+  }
+  .st.is-vertical .st-stem {
+    display: none;
+  }
+  .st.is-vertical .st-dot {
+    left: calc(-1.25rem - 1.5px);
+    top: 1.4rem;
+    bottom: auto;
+  }
+  .st.is-vertical .st-card {
+    padding-left: 0.5rem;
+  }
+</style>
+
+<script>
+  import { initSealTimeline } from '../scripts/sealtimeline';
+  initSealTimeline();
+</script>
