@@ -4,7 +4,7 @@ Sem briefing do cliente. A LP segue a proposta de `../ANALISE_LP_EXPLORE.md`.
 
 ## Marcadas na página (`[[PENDENTE]]`)
 
-1. **Garantia de performance de 10 anos:** só existe como selo no catálogo. Faltam as condições.
+1. Removido da página (17/10/2026), a pedido do Emmanuel: o marcador das condições da garantia de performance de 10 anos. O selo e o texto "conforme o selo do catálogo" continuam.
 2. **Dados técnicos:** reação ao fogo, desempenho acústico, peso total e uso sobre piso elevado (ficha do Explore).
 
 ## Para confirmar com a Belgotex
