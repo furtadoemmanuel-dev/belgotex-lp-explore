@@ -8,6 +8,7 @@ import { getUtms } from './utm';
 import { track } from './analytics';
 
 const MIN_FILL_MS = 3000;
+const MAX_COLORS = 3; // amostras por pedido (definição da Belgotex)
 
 type Rule = (f: HTMLFormElement) => string;
 const val = (f: HTMLFormElement, n: string) =>
@@ -16,7 +17,11 @@ const checkedColors = (f: HTMLFormElement) =>
   [...f.querySelectorAll<HTMLInputElement>('input[name="colors"]:checked')].map((i) => i.value);
 
 const rules: Record<string, Rule> = {
-  colors: (f) => (checkedColors(f).length ? '' : 'Escolha pelo menos uma cor.'),
+  colors: (f) => {
+    const n = checkedColors(f).length;
+    if (!n) return 'Escolha pelo menos uma cor.';
+    return n > MAX_COLORS ? `Escolha até ${MAX_COLORS} cores por pedido.` : '';
+  },
   profile: (f) => (val(f, 'profile') ? '' : 'Selecione o seu perfil.'),
   name: (f) => (val(f, 'name').length >= 3 ? '' : 'Informe o nome completo de quem vai receber.'),
   email: (f) =>
@@ -57,6 +62,21 @@ export function initSample(): void {
   let origin = 'direct';
   let opener: HTMLElement | null = null;
   let started = false;
+  const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="colors"]')];
+  const count = form.querySelector<HTMLElement>('[data-sp-count]')!;
+  // Limite de cores: ao chegar em MAX_COLORS, as não marcadas ficam desabilitadas
+  const syncLimit = () => {
+    const n = checkedColors(form).length;
+    for (const b of boxes) b.disabled = !b.checked && n >= MAX_COLORS;
+    count.textContent = !n
+      ? 'Nenhuma cor escolhida.'
+      : n >= MAX_COLORS
+        ? `${n} de ${MAX_COLORS} cores escolhidas. Para trocar, desmarque uma.`
+        : `${n} de ${MAX_COLORS} cores escolhidas.`;
+  };
+  form.addEventListener('change', (e) => {
+    if ((e.target as HTMLInputElement).name === 'colors') syncLimit();
+  });
 
   const setError = (name: string, msg: string) => {
     const out = form.querySelector<HTMLElement>(`[data-sp-error-for="${name}"]`);
@@ -119,11 +139,15 @@ export function initSample(): void {
       : getSelection().chosen
         ? [...getSelection().colors]
         : [];
-    if (success.hidden)
+    if (success.hidden) {
+      // pré-marca no máximo MAX_COLORS (uma composição pode ter mais cores)
       for (const id of pre) {
+        if (checkedColors(form).length >= MAX_COLORS) break;
         const box = form.querySelector<HTMLInputElement>(`input[name="colors"][value="${id}"]`);
         if (box) box.checked = true;
       }
+      syncLimit();
+    }
     openedAt = Date.now();
     dlg.showModal();
     track('sample_open', { origin });

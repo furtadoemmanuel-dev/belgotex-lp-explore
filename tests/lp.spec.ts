@@ -111,7 +111,7 @@ test('compositor: cores, tom, distribuição, caixas e WhatsApp com as cores', a
   await wa.evaluate((a) => a.addEventListener('click', (e) => e.preventDefault(), { once: true }));
   await wa.click();
   const href = decodeURIComponent((await wa.getAttribute('href'))!);
-  expect(href).toContain('https://wa.me/554291391436');
+  expect(href).toContain('https://wa.me/5542991391436');
   expect(href).toContain('Cores: Frontier 202, Adventure 302, Navigator 502.');
   expect(href).toContain(`Código: ${CODE} · origem: composer`);
   expect(await events(page)).toEqual(expect.arrayContaining(['composer_change', 'whatsapp_click']));
@@ -176,9 +176,28 @@ test('amostra: CTA abre o painel, valida padrões e endereço e envia', async ({
   await dlg.locator('input[name="consent"]').check();
   await page.waitForTimeout(3100); // tempo mínimo anti-robô
   await dlg.getByRole('button', { name: 'Solicitar amostra' }).click();
-  await expect(dlg.getByRole('heading', { name: 'Pedido de amostra recebido' })).toBeVisible();
-  await expect(dlg.locator('[data-sp-summary]')).toHaveText('Frontier 203, Horizon 609');
+  // com o e-mail do XP configurado, o envio abre o e-mail da pessoa já preenchido
+  await expect(dlg.getByRole('heading', { name: 'Falta só enviar o e-mail' })).toBeVisible();
+  const mail = decodeURIComponent((await dlg.locator('[data-sp-mail-link]').getAttribute('href'))!);
+  expect(mail).toMatch(/^mailto:lucas\.boita@belgotex\.com\.br\?/);
+  expect(mail).toContain('Cores: Frontier 203, Horizon 609');
   expect(await events(page)).toEqual(expect.arrayContaining(['sample_open', 'sample_step', 'sample_submit']));
+});
+
+test('amostra: no máximo 3 cores por pedido', async ({ page }) => {
+  await open(page);
+  await page.locator('#amostra').scrollIntoViewIfNeeded();
+  await page.getByRole('link', { name: 'Solicitar amostras' }).first().click();
+  const dlg = page.locator('dialog[data-sample-dialog]');
+  await expect(dlg).toBeVisible();
+  for (const v of ['journey-101', 'frontier-203', 'horizon-609'])
+    await dlg.locator(`label:has(input[name="colors"][value="${v}"])`).click();
+  await expect(dlg.locator('input[name="colors"]:checked')).toHaveCount(3);
+  await expect(dlg.locator('[data-sp-count]')).toContainText('3 de 3 cores');
+  await expect(dlg.locator('input[name="colors"][value="odyssey-403"]')).toBeDisabled();
+  await dlg.locator('label:has(input[name="colors"][value="frontier-203"])').click();
+  await expect(dlg.locator('input[name="colors"][value="odyssey-403"]')).toBeEnabled();
+  await expect(dlg.locator('[data-sp-count]')).toContainText('2 de 3 cores');
 });
 
 test('amostra por e-mail: com SAMPLE_EMAIL, o envio abre o e-mail da pessoa já preenchido', async ({ page }) => {

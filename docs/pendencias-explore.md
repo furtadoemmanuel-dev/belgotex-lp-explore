@@ -49,3 +49,25 @@ RD (`LEAD_ENDPOINT`), GTM, subdomínio (`explore.belgotex.com.br`?), Roomvo, equ
 - "9 cores" também no rodapé e na descrição da página; a matriz diz "39 combinações".
 - Designs numerados 1 a 6 (sem o zero).
 - Linha do tempo dos selos removida: os selos ficam só nos cards de grupo, logo abaixo.
+
+## Resolvido pelo site da Belgotex (21/10/2026)
+
+- Ficha técnica completa ("Especificações Completas" da página do Explore, atualizada em 01/10/2026): reação ao
+  fogo, ΔLw = 21 dB, αw = 0,30, peso total 3.815 g/m², reciclado 47,40%, LEED v4 / WELL etc. Marcador removido;
+  `npm run build:prod` passa.
+- Antiviral: a ficha do site confirma "tratamento antimicrobiano e antiviral" (99%). O selo Microshield segue com o
+  texto do selo.
+- Piso elevado: o guia de instalação do site autoriza, desde que nivelado, sem defeitos e limpo (FAQ atualizado).
+- Roomvo: desconsiderado (o Emmanuel confirmou que não haverá subdomínio). "Ver no meu ambiente" leva à página do
+  produto, onde o site já carrega o plug-in da Roomvo.
+- Hospedagem, DNS e publicação: com o desenvolvedor do site.
+
+## Decisões do Emmanuel (21/10/2026)
+
+- Amostras: até 3 cores por pedido (limite no formulário; não mencionar quem pode pedir).
+- Contatos: os mesmos do Timberland. SAMPLE_EMAIL = lucas.boita@belgotex.com.br; WhatsApp (42) 99139-1436.
+- Legendas (identificadas comparando os renders com as texturas oficiais; o site não legenda as fotos):
+  vistas de cima = Frontier 205 (cinza), 201 (bege), 203 (azul), 206 (grafite); sala de reunião = Frontier 206;
+  lounge verde = Horizon 608 + 609 (o atalho "Lounge" do compositor passou de 607 para 608); o outro lounge = 607.
+- Nomes dos tons: mantidos.
+- Documentos para especificadores: continuam livres para baixar.

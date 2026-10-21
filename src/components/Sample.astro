@@ -87,7 +87,7 @@ const profiles = [
         </div>
         <div data-sc-rest>
           <p class="sc-lead">
-            Escolha as cores da sua composição e receba as amostras pelo correio.
+            Escolha até 3 cores da sua composição e receba as amostras pelo correio.
           </p>
           <div class="actions">
             <a
@@ -154,7 +154,8 @@ const profiles = [
       <fieldset class="sp-step" data-sp-step="1">
         <legend class="sr-only">Cores e perfil</legend>
         <fieldset class="sp-field">
-          <legend>Quais cores você quer receber?</legend>
+          <legend>Quais cores você quer receber? <span class="opt">Até 3 por pedido.</span></legend>
+          <p class="sp-count small" data-sp-count aria-live="polite">Nenhuma cor escolhida.</p>
           <div class="sp-groups">
             {groups.map((g) => (
               <div class="sp-group">
@@ -831,6 +832,15 @@ const profiles = [
   }
   .sp-sw-code {
     color: var(--ink-2);
+  }
+  /* com 3 cores escolhidas, as demais ficam indisponíveis até desmarcar uma */
+  .sp-swatches label:has(input:disabled) {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .sp-count {
+    color: var(--ink-2);
+    margin-top: -0.25rem;
   }
   .sp-swatches label:has(input:checked) {
     border-color: var(--ink);

@@ -87,9 +87,11 @@
  {
   "id": "sala-reuniao",
   "type": "trabalho",
-  "colors": [],
-  "alt": "Sala de reunião envidraçada com carpete Explore grafite",
-  "caption": "Sala de reunião"
+  "colors": [
+   "frontier-206"
+  ],
+  "alt": "Sala de reunião envidraçada com carpete Explore Frontier 206 grafite",
+  "caption": "Sala de reunião · Frontier 206"
  },
  {
   "id": "lounge-horizon-607",

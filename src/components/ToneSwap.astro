@@ -2,16 +2,17 @@
 /**
  * "Mesmo espaço, outro tom": o mesmo escritório visto de cima em quatro tons da coleção (renders da pasta
  * "ambientada", explore8 a explore12). Trocar o tom passa uma cortina de luz sobre o piso.
- * Os arquivos não trazem o código da cor: a cena mostra só o tom, e o código fica com o consultor.
+ * Os arquivos não trazem o código: as cores foram identificadas comparando cada render com as texturas oficiais
+ * (todas Frontier) e aprovadas pelo Emmanuel em 21/10/2026.
  */
 import { Picture } from 'astro:assets';
 import { environmentImages } from '../lib/images';
 
 const views = [
-  { id: 'vista-cinza', tone: 'Cinza', hex: '#77797b' },
-  { id: 'vista-bege', tone: 'Bege', hex: '#8c8577' },
-  { id: 'vista-azul', tone: 'Azul', hex: '#5e6d7c' },
-  { id: 'vista-grafite', tone: 'Grafite', hex: '#3f4042' },
+  { id: 'vista-cinza', tone: 'Cinza', code: 'Frontier 205', hex: '#77797b' },
+  { id: 'vista-bege', tone: 'Bege', code: 'Frontier 201', hex: '#8c8577' },
+  { id: 'vista-azul', tone: 'Azul', code: 'Frontier 203', hex: '#5e6d7c' },
+  { id: 'vista-grafite', tone: 'Grafite', code: 'Frontier 206', hex: '#3f4042' },
 ];
 ---
 
@@ -21,19 +22,19 @@ const views = [
       <p class="eyebrow">Mesmo espaço, outro tom</p>
       <h2 id="tons-title">O tom muda o clima do ambiente.</h2>
       <p class="lead">
-        O mesmo escritório, visto de cima, em quatro tons da coleção. Uma forma rápida de alinhar a escolha com
+        O mesmo escritório, visto de cima, em quatro cores do Frontier. Uma forma rápida de alinhar a escolha com
         a equipe e com o cliente.
       </p>
       <div class="ts-chips" role="radiogroup" aria-label="Tom do piso" data-ts-chips>
         {views.map((v, i) => (
-          <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-ts={i} style={`--c:${v.hex}`}>
+          <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-ts={i} data-ts-name={`${v.code} · ${v.tone}`} style={`--c:${v.hex}`}>
             <span class="dot" aria-hidden="true"></span>
             {v.tone}
           </button>
         ))}
       </div>
       <p class="small muted ts-note">
-        Cenas ilustrativas. Para saber o código exato de cada tom, fale com um consultor ou peça amostras.
+        Cenas ilustrativas. Para ver a cor real, peça amostras.
       </p>
     </div>
     <div class="ts-stage" data-ts-stage>
@@ -44,14 +45,14 @@ const views = [
             formats={['avif', 'webp']}
             widths={[640, 960, 1280, 1600]}
             sizes="(min-width: 900px) 58vw, 100vw"
-            alt={`Escritório visto de cima com carpete Explore em tom ${v.tone.toLowerCase()}`}
+            alt={`Escritório visto de cima com carpete Explore ${v.code}, tom ${v.tone.toLowerCase()}`}
             loading="lazy"
             quality={70}
           />
         </div>
       ))}
       <span class="ts-sweep" aria-hidden="true"></span>
-      <p class="ts-label" aria-live="polite" data-ts-label>{views[0]!.tone}</p>
+      <p class="ts-label" aria-live="polite" data-ts-label>{views[0]!.code} · {views[0]!.tone}</p>
     </div>
   </div>
 </section>
@@ -186,7 +187,7 @@ const views = [
         c.setAttribute('aria-checked', String(i === to));
         c.tabIndex = i === to ? 0 : -1;
       });
-      label.textContent = chips[to]!.textContent!.trim();
+      label.textContent = chips[to]!.dataset.tsName ?? chips[to]!.textContent!.trim();
       const next = imgs[to]!;
       const img = next.querySelector('img');
       if (img) {

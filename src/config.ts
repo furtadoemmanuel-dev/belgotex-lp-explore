@@ -11,13 +11,13 @@ const read = (key: string, fallback: string): string => {
 };
 
 export const config = {
-  whatsappNumber: read('WHATSAPP_NUMBER', '554291391436').replace(/\D/g, ''),
+  whatsappNumber: read('WHATSAPP_NUMBER', '5542991391436').replace(/\D/g, ''),
   campaignCode: read('CAMPAIGN_CODE', 'LP-EXPLORE'),
   leadEndpoint: read('LEAD_ENDPOINT', ''),
   /** "Solicitar cotação" leva à página do Explore no site com o formulário de cotação já aberto (#cotacao). */
   quoteUrl: read('QUOTE_URL', 'https://www.belgotex.com.br/produtos/comercial-em-placas/explore#cotacao'),
   /** Pedido de amostra: e-mail que recebe o pedido (abre o programa de e-mail da pessoa, já preenchido). */
-  sampleEmail: read('SAMPLE_EMAIL', ''),
+  sampleEmail: read('SAMPLE_EMAIL', 'lucas.boita@belgotex.com.br'),
   simulatorUrl: read('SIMULATOR_URL', 'https://www.belgotex.com.br/produtos/comercial-em-placas/explore'),
   privacyUrl: read('PRIVACY_URL', 'https://www.belgotex.com.br/politica-de-privacidade'),
   cookiesUrl: read('COOKIES_URL', 'https://www.belgotex.com.br/politica-de-cookies'),
