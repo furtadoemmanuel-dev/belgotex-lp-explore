@@ -2,8 +2,7 @@
 // Abertura da coleção (texto do catálogo, p. 3) e os números que sustentam a escolha
 const numbers = [
   { big: '6', unit: 'designs', text: 'Cada um com personalidade própria, todos pensados para funcionar juntos.' },
-  { big: '39', unit: 'cores', text: 'Seis tons compartilhados entre os designs, mais três exclusivas do Horizon.' },
-  { big: '33', unit: 'comercial pesado', text: 'Aplicação pela norma EN 1307, para áreas de grande circulação.' },
+  { big: '9', unit: 'cores', text: 'Seis tons compartilhados entre os designs, mais três exclusivas do Horizon.' },
   {
     big: '99%',
     unit: 'eficácia antimicrobiana',
@@ -16,7 +15,7 @@ const numbers = [
   <div class="container grid-12">
     <p class="eyebrow m-eyebrow">A coleção</p>
     <h2 id="manifesto-title" class="m-title" data-reveal>
-      O espaço que você habita conta uma história. O Explore existe para que ela seja única.
+      O espaço que você habita conta uma história. Explore existe para que ela seja única.
     </h2>
     <div class="m-copy" data-reveal style="--d:1">
       <p class="lead">
@@ -77,9 +76,16 @@ const numbers = [
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem var(--col-gap);
   }
+  /* três números: no celular o último ocupa a linha inteira */
+  .numbers > li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
   @media (min-width: 900px) {
+    .numbers > li:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
     .numbers {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   .numbers li {

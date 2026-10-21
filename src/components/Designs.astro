@@ -3,7 +3,7 @@
  * "Seis caminhos, infinitas histórias": a matriz design × tom (6 × 6 + 3 exclusivas do Horizon).
  * Mostra de uma vez por que tudo combina: cada coluna é um tom compartilhado pelos seis designs.
  * Clicar numa cor abre o painel com a textura em Tecelagem, as cores do mesmo tom e as ações.
- * Também publica os dados das 39 cores (#colors-data), usados pelo compositor e pela amostra.
+ * Também publica os dados das 39 combinações (#colors-data), usados pelo compositor e pela amostra.
  */
 import { getImage } from 'astro:assets';
 import Icon from './Icon.astro';
@@ -54,7 +54,7 @@ const designText = Object.fromEntries(designs.map((d) => [d.id, { title: d.title
       <div class="matrix-wrap">
         <table class="matrix" data-matrix>
           <caption class="sr-only">
-            As 39 cores do Explore: designs nas linhas e tons nas colunas. Escolha uma cor para ver os detalhes.
+            As 39 combinações do Explore: designs nas linhas e as 9 cores nas colunas. Escolha uma cor para ver os detalhes.
           </caption>
           <thead>
             <tr>
@@ -71,7 +71,7 @@ const designText = Object.fromEntries(designs.map((d) => [d.id, { title: d.title
             {designs.map((d) => (
               <tr data-row={d.id}>
                 <th scope="row">
-                  <span class="r-n">{String(d.n).padStart(2, '0')}</span>
+                  <span class="r-n">{d.n}</span>
                   <span class="r-name">{d.name}</span>
                 </th>
                 {shared.map((t) => {

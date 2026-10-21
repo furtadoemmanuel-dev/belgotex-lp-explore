@@ -41,3 +41,11 @@ RD (`LEAD_ENDPOINT`), GTM, subdomínio (`explore.belgotex.com.br`?), Roomvo, equ
   desenvolvedor do site o ajuste de `docs/cotacao-site.md` para o modal abrir já com o Explore selecionado.
 - **E-mail do XP para as amostras (`SAMPLE_EMAIL`):** pendente. Até lá o pedido de amostra fica em modo simulado.
 - **WhatsApp do XP (`WHATSAPP_NUMBER`):** pendente; hoje é o número do site.
+
+## Correções do PDF do cliente (21/10/2026)
+
+- Hero: "Seis designs, 9 cores e infinitas possibilidades pensados para funcionar juntos."; saiu "39 cores em 6 designs".
+- "A coleção": "Explore existe para…" (sem "O"); números 6 designs · 9 cores · 99% (saiu o "33 comercial pesado").
+- "9 cores" também no rodapé e na descrição da página; a matriz diz "39 combinações".
+- Designs numerados 1 a 6 (sem o zero).
+- Linha do tempo dos selos removida: os selos ficam só nos cards de grupo, logo abaixo.
